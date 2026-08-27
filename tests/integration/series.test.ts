@@ -216,3 +216,137 @@ describe('horizonte rodante', () => {
     expect(creadas).toBe(0)
   })
 })
+
+describe('reprogramar de acá en adelante y cancelar serie', () => {
+  let carla: ProfesionalDePrueba
+  let otro: ProfesionalDePrueba
+  let paciente: string
+  let serieId: string
+  let turnos: { id: string; periodo: string }[]
+
+  beforeAll(async () => {
+    carla = await crearProfesionalDePrueba()
+    otro = await crearProfesionalDePrueba()
+
+    const { data: p, error } = await carla.cliente
+      .from('patients')
+      .insert({ professional_id: carla.id, nombre: 'Sofía', telefono_e164: '+5492984777777' })
+      .select('id')
+      .single()
+    if (error) throw new Error(error.message)
+    paciente = p.id
+
+    // Cuatro jueves de 2028, 10:00.
+    const fechas = ['2028-03-02', '2028-03-09', '2028-03-16', '2028-03-23']
+    const { data: id, error: e } = await carla.cliente.rpc('crear_serie', {
+      p_patient_id: paciente,
+      p_dia_semana: 4,
+      p_hora_local: '10:00',
+      p_duracion_min: 50,
+      p_frecuencia: 'semanal',
+      p_sesiones_totales: 4,
+      p_desde: '2028-03-02',
+      p_horizonte_hasta: '2028-03-23',
+      p_inicios: fechas.map((f) => inicio(f, '10:00')),
+    })
+    if (e) throw new Error(e.message)
+    serieId = id as unknown as string
+
+    const { data: creados } = await carla.cliente
+      .from('appointments')
+      .select('id, periodo')
+      .eq('series_id', serieId)
+      .order('periodo')
+    turnos = (creados ?? []) as { id: string; periodo: string }[]
+  })
+
+  afterAll(async () => {
+    await borrarProfesionalDePrueba(carla)
+    await borrarProfesionalDePrueba(otro)
+  })
+
+  it('otro profesional NO puede reprogramar una serie ajena', async () => {
+    const { error } = await otro.cliente.rpc('reprogramar_serie_desde', {
+      p_appointment_id: turnos[0].id,
+      p_nuevo_dia_semana: 2,
+      p_nueva_hora: '18:00',
+      p_desde: '2028-03-14',
+    })
+    expect(error).not.toBeNull()
+  })
+
+  it('marca el primer turno como asistido y ese no se toca nunca más', async () => {
+    await carla.cliente.from('appointments').update({ estado: 'asistio' }).eq('id', turnos[0].id)
+
+    const { error } = await carla.cliente.rpc('reprogramar_serie_desde', {
+      p_appointment_id: turnos[1].id,
+      p_nuevo_dia_semana: 2, // martes
+      p_nueva_hora: '18:00',
+      p_desde: '2028-03-14',
+    })
+    expect(error).toBeNull()
+
+    const { data: viejo } = await carla.cliente
+      .from('appointments')
+      .select('estado')
+      .eq('id', turnos[0].id)
+      .single()
+    expect(viejo?.estado).toBe('asistio')
+  })
+
+  it('la serie vieja queda finalizada', async () => {
+    const { data } = await carla.cliente.from('series').select('estado').eq('id', serieId).single()
+    expect(data?.estado).toBe('finalizada')
+  })
+
+  it('los turnos futuros pasan al día y la hora nuevos', async () => {
+    const { data } = await carla.cliente
+      .from('series')
+      .select('id, dia_semana, hora_local, sesiones_totales')
+      .eq('estado', 'activa')
+      .eq('professional_id', carla.id)
+      .single()
+
+    expect(data?.dia_semana).toBe(2)
+    expect(String(data?.hora_local).slice(0, 5)).toBe('18:00')
+    // Quedaba una sesión consumida (la que asistió): restan 3.
+    expect(data?.sesiones_totales).toBe(3)
+
+    const { count } = await carla.cliente
+      .from('appointments')
+      .select('id', { count: 'exact', head: true })
+      .eq('series_id', data!.id)
+    expect(count).toBe(3)
+  })
+
+  it('cancelar_serie cancela los futuros y marca la serie', async () => {
+    const { data: activa } = await carla.cliente
+      .from('series')
+      .select('id')
+      .eq('estado', 'activa')
+      .eq('professional_id', carla.id)
+      .single()
+
+    const { data: cancelados, error } = await carla.cliente.rpc('cancelar_serie', {
+      p_serie_id: activa!.id,
+    })
+    expect(error).toBeNull()
+    expect(cancelados).toBe(3)
+
+    const { data: serie } = await carla.cliente
+      .from('series')
+      .select('estado')
+      .eq('id', activa!.id)
+      .single()
+    expect(serie?.estado).toBe('cancelada')
+  })
+
+  it('el turno asistido sigue intacto después de cancelar la serie', async () => {
+    const { data } = await carla.cliente
+      .from('appointments')
+      .select('estado')
+      .eq('id', turnos[0].id)
+      .single()
+    expect(data?.estado).toBe('asistio')
+  })
+})
