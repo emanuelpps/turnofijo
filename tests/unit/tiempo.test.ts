@@ -7,6 +7,8 @@ import {
   sumarMinutos,
   aTstzrange,
   parsearTstzrange,
+  sumarDias,
+  lunesDeLaSemana,
 } from '../../src/lib/tiempo'
 
 describe('localAUtc', () => {
@@ -84,5 +86,37 @@ describe('aTstzrange y parsearTstzrange', () => {
 
   it('falla ruidosamente si el rango no se reconoce', () => {
     expect(() => parsearTstzrange('cualquier cosa')).toThrow()
+  })
+})
+
+describe('sumarDias', () => {
+  it('suma días dentro del mismo mes', () => {
+    expect(sumarDias('2026-08-24', 3)).toBe('2026-08-27')
+  })
+
+  it('cruza el fin de mes', () => {
+    expect(sumarDias('2026-08-31', 1)).toBe('2026-09-01')
+  })
+
+  it('resta días cruzando el fin de mes', () => {
+    expect(sumarDias('2026-09-01', -1)).toBe('2026-08-31')
+  })
+
+  it('cruza el año', () => {
+    expect(sumarDias('2026-12-31', 1)).toBe('2027-01-01')
+  })
+})
+
+describe('lunesDeLaSemana', () => {
+  it('devuelve el mismo día si ya es lunes', () => {
+    expect(lunesDeLaSemana('2026-08-24')).toBe('2026-08-24')
+  })
+
+  it('retrocede desde un miércoles', () => {
+    expect(lunesDeLaSemana('2026-08-26')).toBe('2026-08-24')
+  })
+
+  it('el domingo pertenece a la semana que arranca el lunes anterior', () => {
+    expect(lunesDeLaSemana('2026-08-30')).toBe('2026-08-24')
   })
 })

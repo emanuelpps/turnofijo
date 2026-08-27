@@ -60,3 +60,24 @@ export function parsearTstzrange(valor: string): { inicio: Date; fin: Date } {
   }
   return { inicio: parsearInstante(m[1]), fin: parsearInstante(m[2]) }
 }
+
+/** Suma (o resta) días a una fecha local `YYYY-MM-DD`. */
+export function sumarDias(fecha: string, dias: number): string {
+  const d = new Date(`${fecha}T00:00:00Z`)
+  if (Number.isNaN(d.getTime())) throw new Error(`Fecha inválida: ${fecha}`)
+  d.setUTCDate(d.getUTCDate() + dias)
+  return d.toISOString().slice(0, 10)
+}
+
+/** Lunes de la semana a la que pertenece la fecha. La semana laboral arranca el lunes. */
+export function lunesDeLaSemana(fecha: string): string {
+  const d = new Date(`${fecha}T00:00:00Z`)
+  if (Number.isNaN(d.getTime())) throw new Error(`Fecha inválida: ${fecha}`)
+  const retroceso = (d.getUTCDay() + 6) % 7
+  return sumarDias(fecha, -retroceso)
+}
+
+/** Fecha de hoy en hora argentina, `YYYY-MM-DD`. */
+export function hoyLocal(): string {
+  return utcALocal(new Date()).fecha
+}
