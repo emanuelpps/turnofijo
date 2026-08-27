@@ -6,7 +6,7 @@ import { cancelarTurno, marcarAsistencia, reactivarTurno } from '@/acciones/turn
 import { parsearTstzrange, utcALocal, sumarDias } from '@/lib/tiempo'
 import { Boton } from '@/componentes/ui/boton'
 import { Dialogo } from '@/componentes/ui/dialogo'
-import { FormularioTurno, type TurnoEnEdicion } from './formulario-turno'
+import { FormularioTurno } from './formulario-turno'
 import type { EstadoTurno, Paciente, TurnoConPaciente } from '@/tipos/db'
 
 const NOMBRES_DIA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
