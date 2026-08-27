@@ -25,7 +25,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
     <div className="min-h-dvh">
       <header className="border-b border-renglon bg-papel">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-          <Link href="/agenda" aria-label="Turno Fijo, ir a la agenda">
+          <Link href="/hoy" aria-label="Turno Fijo, ir a los turnos de hoy">
             <Logotipo />
           </Link>
 

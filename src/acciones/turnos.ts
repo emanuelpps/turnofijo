@@ -157,6 +157,7 @@ export async function guardarTurno(
   }
 
   revalidatePath('/agenda')
+  revalidatePath('/hoy')
   revalidatePath('/pacientes')
   return { ok: true }
 }
@@ -171,6 +172,7 @@ export async function cancelarTurno(datos: FormData) {
     .eq('id', id)
 
   revalidatePath('/agenda')
+  revalidatePath('/hoy')
 }
 
 export async function marcarAsistencia(datos: FormData) {
@@ -183,6 +185,7 @@ export async function marcarAsistencia(datos: FormData) {
   await supabase.from('appointments').update({ estado }).eq('id', id)
 
   revalidatePath('/agenda')
+  revalidatePath('/hoy')
 }
 
 /**
@@ -212,5 +215,6 @@ export async function reactivarTurno(
   }
 
   revalidatePath('/agenda')
+  revalidatePath('/hoy')
   return { ok: true }
 }

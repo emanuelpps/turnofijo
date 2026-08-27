@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+// "Hoy" va primero: es la pantalla que se abre diez veces por jornada.
 const SECCIONES = [
+  { href: '/hoy', texto: 'Hoy' },
   { href: '/agenda', texto: 'Agenda' },
   { href: '/pacientes', texto: 'Pacientes' },
   { href: '/configuracion', texto: 'Configuración' },

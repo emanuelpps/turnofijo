@@ -67,6 +67,7 @@ export async function guardarPaciente(
 
   revalidatePath('/pacientes')
   revalidatePath('/agenda')
+  revalidatePath('/hoy')
   return { ok: true }
 }
 
@@ -78,6 +79,7 @@ export async function archivarPaciente(datos: FormData) {
 
   revalidatePath('/pacientes')
   revalidatePath('/agenda')
+  revalidatePath('/hoy')
 }
 
 export async function desarchivarPaciente(datos: FormData) {
@@ -88,4 +90,5 @@ export async function desarchivarPaciente(datos: FormData) {
 
   revalidatePath('/pacientes')
   revalidatePath('/agenda')
+  revalidatePath('/hoy')
 }

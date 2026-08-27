@@ -43,7 +43,7 @@ export async function actualizarSesion(request: NextRequest) {
   // resuelve el middleware. Sin esto, un usuario con sesión que entra a / ve un 404.
   if (user && (esPublica || ruta === '/')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/agenda'
+    url.pathname = '/hoy'
     return NextResponse.redirect(url)
   }
 

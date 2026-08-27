@@ -43,7 +43,7 @@ export async function registrarse(
   }
 
   revalidatePath('/', 'layout')
-  redirect('/agenda')
+  redirect('/hoy')
 }
 
 export async function iniciarSesion(
@@ -66,7 +66,7 @@ export async function iniciarSesion(
   }
 
   revalidatePath('/', 'layout')
-  redirect('/agenda')
+  redirect('/hoy')
 }
 
 export async function cerrarSesion() {
