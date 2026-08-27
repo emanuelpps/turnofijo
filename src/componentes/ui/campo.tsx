@@ -50,7 +50,7 @@ export function Campo({
         </span>
       )}
       {error && (
-        <span id={idError} className="mt-1 block text-sm text-falta">
+        <span id={idError} className="mt-1 block text-sm text-falta-texto">
           {error}
         </span>
       )}

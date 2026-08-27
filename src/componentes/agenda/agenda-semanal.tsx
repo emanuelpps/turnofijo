@@ -35,17 +35,17 @@ const ESTADOS: Record<EstadoTurno, { palabra: string; tarjeta: string; texto: st
   confirmado: {
     palabra: 'Confirmó',
     tarjeta: 'border-vino/40 bg-vino-sup hover:border-vino',
-    texto: 'text-vino',
+    texto: 'text-vino-texto',
   },
   asistio: {
     palabra: 'Asistió',
     tarjeta: 'border-vino/40 bg-vino-sup hover:border-vino',
-    texto: 'text-vino',
+    texto: 'text-vino-texto',
   },
   ausente: {
     palabra: 'No vino',
     tarjeta: 'border-falta/40 bg-falta-sup hover:border-falta',
-    texto: 'text-falta',
+    texto: 'text-falta-texto',
   },
   cancelado: {
     palabra: 'Cancelado',
@@ -95,7 +95,7 @@ function BotonReactivar({ id, onListo }: { id: string; onListo: () => void }) {
     <form action={accion} className="space-y-2">
       <input type="hidden" name="id" value={id} />
       {estado.error && (
-        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta">
+        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta-texto">
           {estado.error}
         </p>
       )}
@@ -216,7 +216,7 @@ export function AgendaSemanal({
               </div>
 
               {dia.bloqueo && (
-                <p className="mb-2 truncate rounded bg-espera-sup px-1.5 py-1 text-xs font-semibold text-espera">
+                <p className="mb-2 truncate rounded bg-espera-sup px-1.5 py-1 text-xs font-semibold text-espera-texto">
                   {dia.bloqueo}
                 </p>
               )}

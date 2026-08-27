@@ -8,7 +8,7 @@ type Tamano = 'normal' | 'grande'
 const ESTILOS: Record<Variante, string> = {
   primario: 'bg-tinta text-papel hover:opacity-90',
   secundario: 'bg-transparent text-tinta border border-renglon hover:bg-papel-alt',
-  peligro: 'bg-transparent text-falta border border-falta/40 hover:bg-falta-sup',
+  peligro: 'bg-transparent text-falta-texto border border-falta/40 hover:bg-falta-sup',
 }
 
 // 44 px es el mínimo táctil; 56 px es lo que pide el manual para lo que se

@@ -58,12 +58,12 @@ export function PanelBloqueos({ bloqueos }: { bloqueos: Bloqueo[] }) {
       </form>
 
       {estado.error && (
-        <p role="alert" className="mb-4 rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta">
+        <p role="alert" className="mb-4 rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta-texto">
           {estado.error}
         </p>
       )}
       {estado.aviso && (
-        <p role="status" className="mb-4 rounded-marca bg-espera-sup px-3 py-2 text-sm text-espera">
+        <p role="status" className="mb-4 rounded-marca bg-espera-sup px-3 py-2 text-sm text-espera-texto">
           {estado.aviso}
         </p>
       )}

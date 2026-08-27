@@ -66,7 +66,7 @@ export function ListaPacientes({
                     </span>
                   )}
                   {!p.contactable && (
-                    <span className="etiqueta ml-2 rounded bg-espera-sup px-1.5 py-0.5 text-espera">
+                    <span className="etiqueta ml-2 rounded bg-espera-sup px-1.5 py-0.5 text-espera-texto">
                       Revisar teléfono
                     </span>
                   )}

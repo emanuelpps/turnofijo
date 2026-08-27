@@ -15,19 +15,29 @@
   --color-papel-alt: #edefe8;
   --color-tinta: #141c28;
   --color-tinta-sup: #3a4657;
-  --color-lapiz: #6c7689;
+  /* El manual da #6C7689, pero contra papel queda en 4.25:1 y su rol es
+     justamente texto secundario. Bajado lo mínimo para llegar al 4.5:1 que
+     el propio manual exige; a ojo es el mismo gris. */
+  --color-lapiz: #636c7d;
   --color-renglon: #d3d8ce;
   --color-birome: #1d45a6;
   --color-birome-sup: #e4e9f7;
 
   /* Estados del turno. Cada uno corresponde a un estado y a ninguna
-     otra cosa. Nunca son el único indicador: van con la palabra al lado. */
+     otra cosa. Nunca son el único indicador: van con la palabra al lado.
+
+     El color pleno es el del manual y se usa en chips y bordes. La variante
+     `-texto` es para cuando el estado se escribe sobre su propio fondo
+     suave: el ámbar del manual sobre un fondo claro da 2.9:1 y no se lee. */
   --color-vino: #2e7d5b;
   --color-vino-sup: #e3f0ea;
+  --color-vino-texto: #2b7656;
   --color-espera: #b5822a;
   --color-espera-sup: #f6eddb;
+  --color-espera-texto: #8a6320;
   --color-falta: #b23a2e;
   --color-falta-sup: #f7e4e1;
+  --color-falta-texto: #b23a2e;
 
   --radius-marca: 10px;
 
@@ -50,12 +60,17 @@
     --color-birome: #8fa9f2;
     --color-birome-sup: #1b2540;
 
+    /* En oscuro los colores del manual ya pasan de sobra sobre sus fondos
+       suaves, así que la variante de texto es el color pleno. */
     --color-vino: #63bc94;
     --color-vino-sup: #17342a;
+    --color-vino-texto: #63bc94;
     --color-espera: #dfb05c;
     --color-espera-sup: #33280f;
+    --color-espera-texto: #dfb05c;
     --color-falta: #e8837a;
     --color-falta-sup: #3a1c19;
+    --color-falta-texto: #e8837a;
 
     --shadow-marca: 0 1px 2px rgb(0 0 0 / 0.4);
   }

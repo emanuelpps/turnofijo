@@ -137,17 +137,17 @@ export function FormularioHorarios({
       </section>
 
       {estado.error && (
-        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta">
+        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta-texto">
           {estado.error}
         </p>
       )}
       {estado.ok && !estado.aviso && (
-        <p role="status" className="rounded-marca bg-vino-sup px-3 py-2 text-sm text-vino">
+        <p role="status" className="rounded-marca bg-vino-sup px-3 py-2 text-sm text-vino-texto">
           Guardado.
         </p>
       )}
       {estado.aviso && (
-        <p role="status" className="rounded-marca bg-espera-sup px-3 py-2 text-sm text-espera">
+        <p role="status" className="rounded-marca bg-espera-sup px-3 py-2 text-sm text-espera-texto">
           {estado.aviso}
         </p>
       )}

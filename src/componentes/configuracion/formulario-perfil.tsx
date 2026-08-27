@@ -51,12 +51,12 @@ export function FormularioPerfil({ profesional }: { profesional: Profesional | n
       </div>
 
       {estado.error && (
-        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta">
+        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta-texto">
           {estado.error}
         </p>
       )}
       {estado.ok && (
-        <p role="status" className="rounded-marca bg-vino-sup px-3 py-2 text-sm text-vino">
+        <p role="status" className="rounded-marca bg-vino-sup px-3 py-2 text-sm text-vino-texto">
           Guardado.
         </p>
       )}

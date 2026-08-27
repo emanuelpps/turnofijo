@@ -35,7 +35,7 @@ export default function RegistroPage() {
           required
         />
         {estado.error && (
-          <p role="alert" className="text-sm text-falta">
+          <p role="alert" className="text-sm text-falta-texto">
             {estado.error}
           </p>
         )}
