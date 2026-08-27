@@ -13,7 +13,9 @@ import { diaCorto, diaYMes, fechaLarga } from '@/lib/formato'
 import { Boton } from '@/componentes/ui/boton'
 import { Dialogo } from '@/componentes/ui/dialogo'
 import { FormularioTurno } from './formulario-turno'
+import { DialogoReprogramar } from './dialogo-reprogramar'
 import { FormularioSerie } from '@/componentes/series/formulario-serie'
+import { cancelarSerie } from '@/acciones/series'
 import type { EstadoTurno, Paciente, TurnoConPaciente } from '@/tipos/db'
 
 /** Lo que la agenda necesita saber de un día para no mandar al vacío. */
@@ -66,6 +68,7 @@ type TurnoDeVista = {
   horaFin: string
   duracion_min: number
   patient_id: string
+  series_id: string | null
   nombrePaciente: string
   estado: EstadoTurno
 }
@@ -80,6 +83,7 @@ function aVista(t: TurnoConPaciente): TurnoDeVista {
     horaFin: utcALocal(fin).hora,
     duracion_min: Math.round((fin.getTime() - inicio.getTime()) / 60_000),
     patient_id: t.patient_id,
+    series_id: t.series_id,
     nombrePaciente: t.patients?.nombre ?? 'Paciente',
     estado: t.estado,
   }
@@ -132,6 +136,7 @@ export function AgendaSemanal({
   const [abierto, setAbierto] = useState<TurnoDeVista | null>(null)
   const [moviendo, setMoviendo] = useState<TurnoDeVista | null>(null)
   const [serieEn, setSerieEn] = useState<string | null>(null)
+  const [reprogramando, setReprogramando] = useState<TurnoDeVista | null>(null)
 
   const dias = Array.from({ length: 7 }, (_, i) => sumarDias(lunes, i))
   const vista = turnos.map(aVista)
@@ -246,13 +251,23 @@ export function AgendaSemanal({
                         </span>
                         <span
                           className={[
-                            'block truncate text-sm font-semibold',
+                            'flex items-baseline gap-1 text-sm font-semibold',
                             t.estado === 'cancelado'
                               ? 'text-lapiz line-through'
                               : 'text-tinta-sup',
                           ].join(' ')}
                         >
-                          {t.nombrePaciente}
+                          <span className="truncate">{t.nombrePaciente}</span>
+                          {t.series_id && (
+                            <>
+                              {/* El símbolo es una pista, no el dato: al lado va la palabra
+                                  para lector de pantalla, como pide el manual (§04). */}
+                              <span aria-hidden="true" className="shrink-0 text-xs opacity-60">
+                                ↻
+                              </span>
+                              <span className="sr-only">Turno de una serie</span>
+                            </>
+                          )}
                         </span>
                         {t.estado !== 'programado' && (
                           <span className={`etiqueta mt-0.5 block ${estado.texto}`}>
@@ -327,6 +342,27 @@ export function AgendaSemanal({
       </Dialogo>
 
       <Dialogo
+        abierto={reprogramando !== null}
+        onCerrar={() => setReprogramando(null)}
+        titulo="Mover turno de una serie"
+      >
+        {reprogramando && (
+          <DialogoReprogramar
+            key={reprogramando.id}
+            turno={{
+              id: reprogramando.id,
+              patient_id: reprogramando.patient_id,
+              fecha: reprogramando.fecha,
+              hora: reprogramando.hora,
+              duracion_min: reprogramando.duracion_min,
+            }}
+            pacientes={pacientes}
+            onListo={() => setReprogramando(null)}
+          />
+        )}
+      </Dialogo>
+
+      <Dialogo
         abierto={abierto !== null}
         onCerrar={() => setAbierto(null)}
         titulo={abierto ? abierto.nombrePaciente : ''}
@@ -379,7 +415,11 @@ export function AgendaSemanal({
                   variante="secundario"
                   className="w-full"
                   onClick={() => {
-                    setMoviendo(abierto)
+                    // Si es de una serie hay que preguntar primero si el cambio
+                    // es de una vez o para siempre; si es suelto, no hay nada
+                    // que preguntar.
+                    if (abierto.series_id) setReprogramando(abierto)
+                    else setMoviendo(abierto)
                     setAbierto(null)
                   }}
                 >
@@ -392,6 +432,15 @@ export function AgendaSemanal({
                     Cancelar turno
                   </Boton>
                 </form>
+
+                {abierto.series_id && (
+                  <form action={cancelarSerie} onSubmit={() => setAbierto(null)}>
+                    <input type="hidden" name="serie_id" value={abierto.series_id} />
+                    <Boton type="submit" variante="peligro" className="w-full">
+                      Dar de baja toda la serie
+                    </Boton>
+                  </form>
+                )}
               </div>
             )}
           </div>
