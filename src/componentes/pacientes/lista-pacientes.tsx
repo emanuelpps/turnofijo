@@ -17,53 +17,73 @@ export function ListaPacientes({ pacientes }: { pacientes: Paciente[] }) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Pacientes</h1>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1
+            className="text-[1.75rem] font-bold tracking-[-0.018em] sm:text-[2rem]"
+            style={{ fontVariationSettings: '"wdth" 118' }}
+          >
+            Pacientes
+          </h1>
+          <p className="mt-0.5 text-sm text-lapiz">
+            {activos.length === 0
+              ? 'Ninguno cargado todavía'
+              : `${activos.length} en tu agenda`}
+          </p>
+        </div>
         <Boton onClick={() => setCreando(true)}>Nuevo paciente</Boton>
       </div>
 
-      {activos.length === 0 && (
-        <p className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500">
-          Todavía no cargaste ningún paciente.
-        </p>
+      {activos.length === 0 ? (
+        <div className="rounded-marca border border-dashed border-renglon px-6 py-12 text-center">
+          <p className="font-semibold text-tinta">Todavía no cargaste ningún paciente.</p>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-lapiz">
+            Cargá uno y ya vas a poder darle su turno en la agenda.
+          </p>
+          <Boton className="mt-4" onClick={() => setCreando(true)}>
+            Cargar el primero
+          </Boton>
+        </div>
+      ) : (
+        <ul className="divide-y divide-renglon rounded-marca border border-renglon">
+          {activos.map((p) => (
+            <li key={p.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+              <div className="min-w-40 flex-1">
+                <p className="truncate font-semibold text-tinta">{p.nombre}</p>
+                <p className="tabular text-sm text-lapiz">
+                  {formatearTelefonoParaMostrar(p.telefono_e164)}
+                  {!p.contactable && (
+                    <span className="etiqueta ml-2 rounded bg-espera-sup px-1.5 py-0.5 text-espera">
+                      Revisar teléfono
+                    </span>
+                  )}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Boton variante="secundario" onClick={() => setEnEdicion(p)}>
+                  Editar
+                </Boton>
+                <form action={archivarPaciente}>
+                  <input type="hidden" name="id" value={p.id} />
+                  <Boton variante="peligro" type="submit">
+                    Archivar
+                  </Boton>
+                </form>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
-
-      <ul className="divide-y divide-zinc-200">
-        {activos.map((p) => (
-          <li key={p.id} className="flex items-center gap-4 py-3">
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-medium">{p.nombre}</p>
-              <p className="text-sm text-zinc-600">
-                {formatearTelefonoParaMostrar(p.telefono_e164)}
-                {!p.contactable && (
-                  <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">
-                    revisar teléfono
-                  </span>
-                )}
-              </p>
-            </div>
-            <Boton variante="secundario" onClick={() => setEnEdicion(p)}>
-              Editar
-            </Boton>
-            <form action={archivarPaciente}>
-              <input type="hidden" name="id" value={p.id} />
-              <Boton variante="peligro" type="submit">
-                Archivar
-              </Boton>
-            </form>
-          </li>
-        ))}
-      </ul>
 
       {archivados.length > 0 && (
         <details className="mt-8">
-          <summary className="cursor-pointer text-sm text-zinc-600">
+          <summary className="cursor-pointer text-sm font-medium text-lapiz hover:text-tinta">
             Archivados ({archivados.length})
           </summary>
-          <ul className="mt-2 divide-y divide-zinc-200">
+          <ul className="mt-2 divide-y divide-renglon rounded-marca border border-renglon">
             {archivados.map((p) => (
-              <li key={p.id} className="flex items-center gap-4 py-3 text-zinc-500">
-                <span className="flex-1 truncate">{p.nombre}</span>
+              <li key={p.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+                <span className="min-w-40 flex-1 truncate text-lapiz">{p.nombre}</span>
                 <form action={desarchivarPaciente}>
                   <input type="hidden" name="id" value={p.id} />
                   <Boton variante="secundario" type="submit">

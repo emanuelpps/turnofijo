@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { guardarConfiguracion, type EstadoFormulario } from '@/acciones/configuracion'
 import { Boton } from '@/componentes/ui/boton'
+import { CONTROL } from '@/componentes/ui/estilos'
 import type { FranjaHorariaFila } from '@/tipos/db'
 
 const DIAS: { numero: number; nombre: string }[] = [
@@ -27,6 +28,8 @@ function franjasDelDia(franjas: FranjaHorariaFila[], dia: number) {
   return { manana: delDia[0], tarde: delDia[1] }
 }
 
+const HORA = `tabular w-[6.5rem] ${CONTROL}`
+
 export function FormularioHorarios({
   franjas,
   duracionDefault,
@@ -40,54 +43,89 @@ export function FormularioHorarios({
   )
 
   return (
-    <form action={accion} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-zinc-700">
-          Duración por defecto de una sesión (minutos)
+    <form action={accion} className="space-y-7">
+      <section>
+        <h2 className="text-lg font-bold">Duración de una sesión</h2>
+        <p className="mt-0.5 mb-2 text-sm text-lapiz">
+          Es la que se propone al agendar. Después la podés cambiar turno por turno.
+        </p>
+        <label htmlFor="duracion_default_min" className="sr-only">
+          Duración por defecto en minutos
+        </label>
+        <div className="flex items-center gap-2">
           <input
+            id="duracion_default_min"
             type="number"
             name="duracion_default_min"
             defaultValue={duracionDefault}
             min={5}
             max={480}
             step={5}
-            className="mt-1 block w-32 min-h-11 rounded-lg border border-zinc-300 px-3"
+            className={`tabular w-24 ${CONTROL}`}
           />
-        </label>
-      </div>
+          <span className="text-sm text-lapiz">minutos</span>
+        </div>
+      </section>
 
-      <div>
-        <h2 className="mb-2 font-medium">Horarios de atención</h2>
-        <p className="mb-3 text-sm text-zinc-600">
+      <section>
+        <h2 className="text-lg font-bold">Horarios de atención</h2>
+        <p className="mt-0.5 mb-3 text-sm text-lapiz">
           Dejá las dos horas vacías para los días que no atendés.
         </p>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[34rem] text-sm">
+
+        <div className="overflow-x-auto rounded-marca border border-renglon">
+          <table className="w-full min-w-[36rem] text-sm">
             <thead>
-              <tr className="text-left text-zinc-500">
-                <th className="py-2 font-medium">Día</th>
-                <th className="py-2 font-medium">Mañana</th>
-                <th className="py-2 font-medium">Tarde</th>
+              <tr className="border-b border-renglon">
+                <th className="etiqueta px-4 py-2 text-left">Día</th>
+                <th className="etiqueta px-4 py-2 text-left">Mañana</th>
+                <th className="etiqueta px-4 py-2 text-left">Tarde</th>
               </tr>
             </thead>
             <tbody>
               {DIAS.map(({ numero, nombre }) => {
                 const { manana, tarde } = franjasDelDia(franjas, numero)
                 return (
-                  <tr key={numero} className="border-t border-zinc-200">
-                    <td className="py-2 pr-4 font-medium">{nombre}</td>
-                    <td className="py-2 pr-4">
-                      <div className="flex items-center gap-1">
-                        <input type="time" name={`d${numero}_manana_desde`} defaultValue={aHHMM(manana?.desde)} className="min-h-11 rounded-lg border border-zinc-300 px-2" />
-                        <span className="text-zinc-400">a</span>
-                        <input type="time" name={`d${numero}_manana_hasta`} defaultValue={aHHMM(manana?.hasta)} className="min-h-11 rounded-lg border border-zinc-300 px-2" />
+                  <tr key={numero} className="border-t border-renglon first:border-t-0">
+                    <th scope="row" className="px-4 py-2 text-left font-semibold text-tinta">
+                      {nombre}
+                    </th>
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="time"
+                          aria-label={`${nombre}, mañana, desde`}
+                          name={`d${numero}_manana_desde`}
+                          defaultValue={aHHMM(manana?.desde)}
+                          className={HORA}
+                        />
+                        <span className="text-lapiz">a</span>
+                        <input
+                          type="time"
+                          aria-label={`${nombre}, mañana, hasta`}
+                          name={`d${numero}_manana_hasta`}
+                          defaultValue={aHHMM(manana?.hasta)}
+                          className={HORA}
+                        />
                       </div>
                     </td>
-                    <td className="py-2">
-                      <div className="flex items-center gap-1">
-                        <input type="time" name={`d${numero}_tarde_desde`} defaultValue={aHHMM(tarde?.desde)} className="min-h-11 rounded-lg border border-zinc-300 px-2" />
-                        <span className="text-zinc-400">a</span>
-                        <input type="time" name={`d${numero}_tarde_hasta`} defaultValue={aHHMM(tarde?.hasta)} className="min-h-11 rounded-lg border border-zinc-300 px-2" />
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="time"
+                          aria-label={`${nombre}, tarde, desde`}
+                          name={`d${numero}_tarde_desde`}
+                          defaultValue={aHHMM(tarde?.desde)}
+                          className={HORA}
+                        />
+                        <span className="text-lapiz">a</span>
+                        <input
+                          type="time"
+                          aria-label={`${nombre}, tarde, hasta`}
+                          name={`d${numero}_tarde_hasta`}
+                          defaultValue={aHHMM(tarde?.hasta)}
+                          className={HORA}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -96,10 +134,18 @@ export function FormularioHorarios({
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      {estado.error && <p className="text-sm text-red-600">{estado.error}</p>}
-      {estado.ok && <p className="text-sm text-green-700">Guardado.</p>}
+      {estado.error && (
+        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta">
+          {estado.error}
+        </p>
+      )}
+      {estado.ok && (
+        <p role="status" className="rounded-marca bg-vino-sup px-3 py-2 text-sm text-vino">
+          Guardado.
+        </p>
+      )}
 
       <Boton type="submit" disabled={pendiente}>
         {pendiente ? 'Guardando…' : 'Guardar configuración'}

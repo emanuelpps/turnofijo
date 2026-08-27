@@ -9,7 +9,8 @@ export default async function AgendaPage({
   searchParams: Promise<{ semana?: string }>
 }) {
   const { semana } = await searchParams
-  const referencia = /^\d{4}-\d{2}-\d{2}$/.test(semana ?? '') ? semana! : hoyLocal()
+  const hoy = hoyLocal()
+  const referencia = /^\d{4}-\d{2}-\d{2}$/.test(semana ?? '') ? semana! : hoy
   const lunes = lunesDeLaSemana(referencia)
 
   const desde = localAUtc(lunes, '00:00')
@@ -29,6 +30,7 @@ export default async function AgendaPage({
   return (
     <AgendaSemanal
       lunes={lunes}
+      hoy={hoy}
       turnos={(turnos ?? []) as TurnoConPaciente[]}
       pacientes={(pacientes ?? []) as Paciente[]}
       duracionDefault={(profesional as Profesional | null)?.duracion_default_min ?? 50}

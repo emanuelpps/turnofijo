@@ -26,10 +26,36 @@ export function Dialogo({
     <dialog
       ref={ref}
       onClose={onCerrar}
-      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-xl p-0 backdrop:bg-black/40"
+      // <dialog> nativo no cierra al tocar afuera: el click cae en el propio
+      // <dialog> (el backdrop es su pseudoelemento), no en el contenido.
+      onClick={(evento) => {
+        if (evento.target === ref.current) onCerrar()
+      }}
+      className={[
+        'm-auto w-[min(30rem,calc(100vw-2rem))] p-0',
+        'rounded-[14px] border border-renglon bg-papel text-tinta shadow-marca',
+        'backdrop:bg-tinta/40',
+      ].join(' ')}
     >
       <div className="p-5">
-        <h2 className="mb-4 text-lg font-semibold">{titulo}</h2>
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <h2 className="text-lg font-bold text-tinta">{titulo}</h2>
+          <button
+            type="button"
+            onClick={onCerrar}
+            aria-label="Cerrar"
+            className="-m-2 shrink-0 rounded-marca p-2 text-lapiz hover:text-tinta"
+          >
+            <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true">
+              <path
+                d="M5 5l10 10M15 5L5 15"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
         {children}
       </div>
     </dialog>

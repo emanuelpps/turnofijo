@@ -13,10 +13,7 @@ export function FormularioPaciente({
   paciente?: Paciente
   onGuardado: () => void
 }) {
-  const [estado, accion, pendiente] = useActionState<EstadoFormulario, FormData>(
-    guardarPaciente,
-    {},
-  )
+  const [estado, accion, pendiente] = useActionState<EstadoFormulario, FormData>(guardarPaciente, {})
 
   useEffect(() => {
     if (estado.ok) onGuardado()
@@ -25,36 +22,43 @@ export function FormularioPaciente({
   return (
     <form action={accion} className="space-y-4">
       {paciente && <input type="hidden" name="id" value={paciente.id} />}
+
       <Campo etiqueta="Nombre" name="nombre" defaultValue={paciente?.nombre ?? ''} required />
+
       <Campo
         etiqueta="Teléfono"
         name="telefono"
         inputMode="tel"
         placeholder="2984 12-3456"
         defaultValue={paciente?.telefono_e164 ?? ''}
+        ayuda="Con código de área, sin el 0 ni el 15."
         required
       />
+
       <Campo
         etiqueta="Email (opcional)"
         name="email"
         type="email"
         defaultValue={paciente?.email ?? ''}
       />
+
       <Campo
         etiqueta="Notas administrativas (opcional)"
         name="notas_administrativas"
         defaultValue={paciente?.notas_administrativas ?? ''}
         placeholder="Obra social, quién lo derivó, etc."
+        ayuda="No cargues información clínica: Turno Fijo no guarda historia clínica."
       />
-      <p className="text-xs text-zinc-500">
-        No cargues información clínica acá: Turno Fijo no guarda historia clínica.
-      </p>
-      {estado.error && <p className="text-sm text-red-600">{estado.error}</p>}
-      <div className="flex justify-end gap-2">
-        <Boton type="submit" disabled={pendiente}>
-          {pendiente ? 'Guardando…' : 'Guardar'}
-        </Boton>
-      </div>
+
+      {estado.error && (
+        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta">
+          {estado.error}
+        </p>
+      )}
+
+      <Boton type="submit" tamano="grande" className="w-full" disabled={pendiente}>
+        {pendiente ? 'Guardando…' : 'Guardar'}
+      </Boton>
     </form>
   )
 }

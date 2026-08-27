@@ -2,12 +2,8 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
 import { cerrarSesion } from '../(auth)/acciones'
-
-const NAVEGACION = [
-  { href: '/agenda', texto: 'Agenda' },
-  { href: '/pacientes', texto: 'Pacientes' },
-  { href: '/configuracion', texto: 'Configuración' },
-]
+import { Logotipo } from '@/componentes/marca/logo'
+import { Navegacion } from '@/componentes/navegacion'
 
 export default async function LayoutApp({ children }: { children: React.ReactNode }) {
   const supabase = await crearClienteServidor()
@@ -27,26 +23,28 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-dvh">
-      <header className="border-b border-zinc-200">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
-          <span className="font-semibold">Turno Fijo</span>
-          <nav className="flex gap-4 text-sm">
-            {NAVEGACION.map((item) => (
-              <Link key={item.href} href={item.href} className="text-zinc-600 hover:text-zinc-900">
-                {item.texto}
-              </Link>
-            ))}
-          </nav>
-          <div className="ml-auto flex items-center gap-3 text-sm text-zinc-600">
+      <header className="border-b border-renglon bg-papel">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
+          <Link href="/agenda" aria-label="Turno Fijo, ir a la agenda">
+            <Logotipo />
+          </Link>
+
+          <Navegacion />
+
+          <div className="ml-auto flex items-center gap-3 text-sm text-tinta-sup">
             <span className="hidden sm:inline">{profesional?.nombre || user.email}</span>
             <form action={cerrarSesion}>
-              <button type="submit" className="underline">
+              <button
+                type="submit"
+                className="rounded-marca px-2 py-2 font-medium text-lapiz hover:text-tinta"
+              >
                 Salir
               </button>
             </form>
           </div>
         </div>
       </header>
+
       <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
     </div>
   )

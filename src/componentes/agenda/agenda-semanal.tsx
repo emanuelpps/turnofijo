@@ -4,25 +4,53 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { cancelarTurno, marcarAsistencia, reactivarTurno } from '@/acciones/turnos'
 import { parsearTstzrange, utcALocal, sumarDias } from '@/lib/tiempo'
+import { diaCorto, diaYMes, fechaLarga } from '@/lib/formato'
 import { Boton } from '@/componentes/ui/boton'
 import { Dialogo } from '@/componentes/ui/dialogo'
 import { FormularioTurno } from './formulario-turno'
 import type { EstadoTurno, Paciente, TurnoConPaciente } from '@/tipos/db'
 
-const NOMBRES_DIA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-
-const COLOR_ESTADO: Record<EstadoTurno, string> = {
-  programado: 'bg-zinc-100 text-zinc-900',
-  confirmado: 'bg-green-100 text-green-900',
-  cancelado: 'bg-zinc-50 text-zinc-400 line-through',
-  asistio: 'bg-blue-100 text-blue-900',
-  ausente: 'bg-red-100 text-red-900',
+/**
+ * Los estados llevan color Y palabra, siempre. El manual de marca (§04) lo pide
+ * explícito: una parte de los usuarios no distingue verde de rojo, así que el
+ * color nunca puede ser el único indicador.
+ *
+ * `programado` es el estado neutro y no tiene color propio: no necesita
+ * etiqueta porque no hay color que desambiguar.
+ */
+const ESTADOS: Record<EstadoTurno, { palabra: string; tarjeta: string; texto: string }> = {
+  programado: {
+    palabra: 'Sin marcar',
+    tarjeta: 'border-renglon bg-papel-alt hover:border-lapiz',
+    texto: 'text-lapiz',
+  },
+  confirmado: {
+    palabra: 'Confirmó',
+    tarjeta: 'border-vino/40 bg-vino-sup hover:border-vino',
+    texto: 'text-vino',
+  },
+  asistio: {
+    palabra: 'Asistió',
+    tarjeta: 'border-vino/40 bg-vino-sup hover:border-vino',
+    texto: 'text-vino',
+  },
+  ausente: {
+    palabra: 'No vino',
+    tarjeta: 'border-falta/40 bg-falta-sup hover:border-falta',
+    texto: 'text-falta',
+  },
+  cancelado: {
+    palabra: 'Cancelado',
+    tarjeta: 'border-renglon bg-papel hover:border-lapiz',
+    texto: 'text-lapiz',
+  },
 }
 
 type TurnoDeVista = {
   id: string
   fecha: string
   hora: string
+  horaFin: string
   duracion_min: number
   patient_id: string
   nombrePaciente: string
@@ -36,6 +64,7 @@ function aVista(t: TurnoConPaciente): TurnoDeVista {
     id: t.id,
     fecha: local.fecha,
     hora: local.hora,
+    horaFin: utcALocal(fin).hora,
     duracion_min: Math.round((fin.getTime() - inicio.getTime()) / 60_000),
     patient_id: t.patient_id,
     nombrePaciente: t.patients?.nombre ?? 'Paciente',
@@ -45,11 +74,13 @@ function aVista(t: TurnoConPaciente): TurnoDeVista {
 
 export function AgendaSemanal({
   lunes,
+  hoy,
   turnos,
   pacientes,
   duracionDefault,
 }: {
   lunes: string
+  hoy: string
   turnos: TurnoConPaciente[]
   pacientes: Paciente[]
   duracionDefault: number
@@ -60,58 +91,122 @@ export function AgendaSemanal({
 
   const dias = Array.from({ length: 7 }, (_, i) => sumarDias(lunes, i))
   const vista = turnos.map(aVista)
+  const vigentes = vista.filter((t) => t.estado !== 'cancelado')
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3">
-        <h1 className="text-xl font-semibold">Agenda</h1>
-        <div className="ml-auto flex items-center gap-2 text-sm">
-          <Link href={`/agenda?semana=${sumarDias(lunes, -7)}`} className="rounded-lg border border-zinc-300 px-3 py-2">
-            ← Semana anterior
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div>
+          <h1
+            className="text-[1.75rem] font-bold tracking-[-0.018em] sm:text-[2rem]"
+            style={{ fontVariationSettings: '"wdth" 118' }}
+          >
+            Agenda
+          </h1>
+          <p className="mt-0.5 text-sm text-lapiz">
+            {fechaLarga(lunes)} al {fechaLarga(sumarDias(lunes, 6))} ·{' '}
+            {vigentes.length === 0
+              ? 'sin turnos'
+              : `${vigentes.length} turno${vigentes.length === 1 ? '' : 's'}`}
+          </p>
+        </div>
+
+        <nav aria-label="Cambiar de semana" className="flex items-center gap-2 text-sm">
+          <Link
+            href={`/agenda?semana=${sumarDias(lunes, -7)}`}
+            className="inline-flex min-h-11 items-center rounded-marca border border-renglon px-3 font-medium text-tinta-sup hover:bg-papel-alt hover:text-tinta"
+          >
+            ← Anterior
           </Link>
-          <Link href="/agenda" className="rounded-lg border border-zinc-300 px-3 py-2">
+          <Link
+            href="/agenda"
+            className="inline-flex min-h-11 items-center rounded-marca border border-renglon px-3 font-medium text-tinta-sup hover:bg-papel-alt hover:text-tinta"
+          >
             Hoy
           </Link>
-          <Link href={`/agenda?semana=${sumarDias(lunes, 7)}`} className="rounded-lg border border-zinc-300 px-3 py-2">
-            Semana siguiente →
+          <Link
+            href={`/agenda?semana=${sumarDias(lunes, 7)}`}
+            className="inline-flex min-h-11 items-center rounded-marca border border-renglon px-3 font-medium text-tinta-sup hover:bg-papel-alt hover:text-tinta"
+          >
+            Siguiente →
           </Link>
-        </div>
+        </nav>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-7">
-        {dias.map((fecha, i) => {
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
+        {dias.map((fecha) => {
           const delDia = vista
             .filter((t) => t.fecha === fecha)
             .sort((a, b) => (a.hora < b.hora ? -1 : 1))
+          const esHoy = fecha === hoy
 
           return (
-            <div key={fecha} className="rounded-lg border border-zinc-200 p-2">
-              <div className="mb-2 flex items-baseline gap-2">
-                <span className="text-sm font-medium">{NOMBRES_DIA[i]}</span>
-                <span className="text-xs text-zinc-500">{fecha.slice(8)}/{fecha.slice(5, 7)}</span>
+            <section
+              key={fecha}
+              aria-label={fechaLarga(fecha)}
+              className={[
+                'rounded-marca border p-2',
+                esHoy ? 'border-birome bg-birome-sup/40' : 'border-renglon bg-papel',
+              ].join(' ')}
+            >
+              <div className="mb-2 flex items-baseline gap-2 px-1">
+                <span
+                  className={[
+                    'font-display text-sm font-bold',
+                    esHoy ? 'text-birome' : 'text-tinta',
+                  ].join(' ')}
+                >
+                  {diaCorto(fecha)}
+                </span>
+                <span className="tabular text-xs text-lapiz">{diaYMes(fecha)}</span>
+                {esHoy && <span className="etiqueta ml-auto text-birome">Hoy</span>}
               </div>
 
               <ul className="space-y-1">
-                {delDia.map((t) => (
-                  <li key={t.id}>
-                    <button
-                      onClick={() => setAbierto(t)}
-                      className={`w-full rounded px-2 py-1.5 text-left text-sm ${COLOR_ESTADO[t.estado]}`}
-                    >
-                      <span className="font-medium">{t.hora}</span>{' '}
-                      <span className="truncate">{t.nombrePaciente}</span>
-                    </button>
-                  </li>
-                ))}
+                {delDia.map((t) => {
+                  const estado = ESTADOS[t.estado]
+                  return (
+                    <li key={t.id}>
+                      <button
+                        onClick={() => setAbierto(t)}
+                        className={`w-full rounded-marca border px-2 py-2 text-left transition-colors ${estado.tarjeta}`}
+                      >
+                        <span
+                          className={[
+                            'tabular font-display block text-base leading-tight font-bold',
+                            t.estado === 'cancelado' ? 'text-lapiz line-through' : 'text-tinta',
+                          ].join(' ')}
+                        >
+                          {t.hora}
+                        </span>
+                        <span
+                          className={[
+                            'block truncate text-sm font-semibold',
+                            t.estado === 'cancelado'
+                              ? 'text-lapiz line-through'
+                              : 'text-tinta-sup',
+                          ].join(' ')}
+                        >
+                          {t.nombrePaciente}
+                        </span>
+                        {t.estado !== 'programado' && (
+                          <span className={`etiqueta mt-0.5 block ${estado.texto}`}>
+                            {estado.palabra}
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  )
+                })}
               </ul>
 
               <button
                 onClick={() => setNuevoEn(fecha)}
-                className="mt-2 w-full rounded border border-dashed border-zinc-300 py-1.5 text-sm text-zinc-500 hover:border-zinc-400 hover:text-zinc-700"
+                className="mt-2 min-h-11 w-full rounded-marca border border-dashed border-renglon text-sm font-medium text-lapiz hover:border-birome hover:text-birome"
               >
                 + Turno
               </button>
-            </div>
+            </section>
           )
         })}
       </div>
@@ -127,11 +222,7 @@ export function AgendaSemanal({
         )}
       </Dialogo>
 
-      <Dialogo
-        abierto={moviendo !== null}
-        onCerrar={() => setMoviendo(null)}
-        titulo="Mover turno"
-      >
+      <Dialogo abierto={moviendo !== null} onCerrar={() => setMoviendo(null)} titulo="Mover turno">
         {moviendo && (
           <FormularioTurno
             key={moviendo.id}
@@ -155,32 +246,48 @@ export function AgendaSemanal({
       >
         {abierto && (
           <div className="space-y-4">
-            <p className="text-sm text-zinc-600">
-              {abierto.fecha} a las {abierto.hora} · {abierto.duracion_min} min ·{' '}
-              <span className="font-medium">{abierto.estado}</span>
-            </p>
+            <div className="rounded-marca border border-renglon bg-papel-alt px-4 py-3">
+              <p className="tabular font-display text-2xl font-bold text-tinta">
+                {abierto.hora}{' '}
+                <span className="text-base font-normal text-lapiz">a {abierto.horaFin}</span>
+              </p>
+              <p className="mt-1 text-sm text-tinta-sup">
+                {fechaLarga(abierto.fecha)} · {abierto.duracion_min} min
+              </p>
+              <p className={`etiqueta mt-2 ${ESTADOS[abierto.estado].texto}`}>
+                {ESTADOS[abierto.estado].palabra}
+              </p>
+            </div>
 
             {abierto.estado === 'cancelado' ? (
               <form action={reactivarTurno} onSubmit={() => setAbierto(null)}>
                 <input type="hidden" name="id" value={abierto.id} />
-                <Boton type="submit" variante="secundario" className="w-full">
+                <Boton type="submit" tamano="grande" className="w-full">
                   Reactivar turno
                 </Boton>
               </form>
             ) : (
               <div className="space-y-2">
                 <div className="flex gap-2">
-                  <form action={marcarAsistencia} onSubmit={() => setAbierto(null)} className="flex-1">
+                  <form
+                    action={marcarAsistencia}
+                    onSubmit={() => setAbierto(null)}
+                    className="flex-1"
+                  >
                     <input type="hidden" name="id" value={abierto.id} />
                     <input type="hidden" name="estado" value="asistio" />
-                    <Boton type="submit" className="w-full">
+                    <Boton type="submit" tamano="grande" className="w-full">
                       Asistió
                     </Boton>
                   </form>
-                  <form action={marcarAsistencia} onSubmit={() => setAbierto(null)} className="flex-1">
+                  <form
+                    action={marcarAsistencia}
+                    onSubmit={() => setAbierto(null)}
+                    className="flex-1"
+                  >
                     <input type="hidden" name="id" value={abierto.id} />
                     <input type="hidden" name="estado" value="ausente" />
-                    <Boton type="submit" variante="secundario" className="w-full">
+                    <Boton type="submit" tamano="grande" variante="secundario" className="w-full">
                       No vino
                     </Boton>
                   </form>
@@ -194,7 +301,7 @@ export function AgendaSemanal({
                     setAbierto(null)
                   }}
                 >
-                  Mover
+                  Mover a otro día u hora
                 </Boton>
 
                 <form action={cancelarTurno} onSubmit={() => setAbierto(null)}>

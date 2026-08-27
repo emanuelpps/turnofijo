@@ -1,16 +1,136 @@
 @import "tailwindcss";
 
-:root {
-  --fondo: #ffffff;
-  --texto: #18181b;
+/* ─────────────────────────────────────────────────────────────
+   Tokens de marca — Turno Fijo.
+   Fuente de verdad: docs/marca/manual-de-marca.html (§04 y §05).
+
+   El bloque @theme define la paleta clara y la expone como
+   utilidades de Tailwind (bg-papel, text-tinta, border-renglon…).
+   Los dos bloques de abajo SOLO redefinen tokens, nunca componentes:
+   como las utilidades resuelven a var(--color-*), el modo oscuro
+   sale gratis y no hace falta prefijar nada con dark:.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-papel: #f6f7f3;
+  --color-papel-alt: #edefe8;
+  --color-tinta: #141c28;
+  --color-tinta-sup: #3a4657;
+  --color-lapiz: #6c7689;
+  --color-renglon: #d3d8ce;
+  --color-birome: #1d45a6;
+  --color-birome-sup: #e4e9f7;
+
+  /* Estados del turno. Cada uno corresponde a un estado y a ninguna
+     otra cosa. Nunca son el único indicador: van con la palabra al lado. */
+  --color-vino: #2e7d5b;
+  --color-vino-sup: #e3f0ea;
+  --color-espera: #b5822a;
+  --color-espera-sup: #f6eddb;
+  --color-falta: #b23a2e;
+  --color-falta-sup: #f7e4e1;
+
+  --radius-marca: 10px;
+
+  --font-display: var(--fuente-display), "Helvetica Neue", Arial, sans-serif;
+  --font-texto: var(--fuente-texto), "Helvetica Neue", Arial, sans-serif;
+
+  --shadow-marca: 0 1px 2px rgb(20 28 40 / 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-papel: #0f141c;
+    --color-papel-alt: #161d28;
+    --color-tinta: #e7eae4;
+    --color-tinta-sup: #b4bcc7;
+    --color-lapiz: #8a94a5;
+    --color-renglon: #2a3341;
+    /* El azul de marca no tiene contraste suficiente sobre oscuro:
+       usarlo igual es el error más común del manual. */
+    --color-birome: #8fa9f2;
+    --color-birome-sup: #1b2540;
+
+    --color-vino: #63bc94;
+    --color-vino-sup: #17342a;
+    --color-espera: #dfb05c;
+    --color-espera-sup: #33280f;
+    --color-falta: #e8837a;
+    --color-falta-sup: #3a1c19;
+
+    --shadow-marca: 0 1px 2px rgb(0 0 0 / 0.4);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-papel: #0f141c;
+  --color-papel-alt: #161d28;
+  --color-tinta: #e7eae4;
+  --color-tinta-sup: #b4bcc7;
+  --color-lapiz: #8a94a5;
+  --color-renglon: #2a3341;
+  --color-birome: #8fa9f2;
+  --color-birome-sup: #1b2540;
+
+  --color-vino: #63bc94;
+  --color-vino-sup: #17342a;
+  --color-espera: #dfb05c;
+  --color-espera-sup: #33280f;
+  --color-falta: #e8837a;
+  --color-falta-sup: #3a1c19;
+
+  --shadow-marca: 0 1px 2px rgb(0 0 0 / 0.4);
 }
 
 html {
-  color-scheme: light;
+  color-scheme: light dark;
 }
 
 body {
-  background: var(--fondo);
-  color: var(--texto);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--color-papel);
+  color: var(--color-tinta);
+  font-family: var(--font-texto);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Archivo es variable: sin fijar el ancho sale en 100 y pierde la
+   firmeza de cartel de consultorio que pide el manual (§05). */
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 116;
+  text-wrap: balance;
+  line-height: 1.1;
+}
+
+/* Casi toda la app son horas en columna: sin tabular no alinean. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.etiqueta {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-lapiz);
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-birome);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Chrome pinta los campos autocompletados con su propio celeste y se lleva
+   puesta la paleta. No hay forma de setear background-color: el único camino
+   es tapar con una sombra interna del color de papel. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 100px var(--color-papel) inset;
+  -webkit-text-fill-color: var(--color-tinta);
+  caret-color: var(--color-tinta);
 }

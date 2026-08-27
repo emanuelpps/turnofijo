@@ -3,22 +3,50 @@ import { clsx } from 'clsx'
 export function Campo({
   etiqueta,
   error,
+  ayuda,
   className,
+  id,
+  name,
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & { etiqueta: string; error?: string }) {
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  etiqueta: string
+  error?: string
+  ayuda?: string
+}) {
+  // Sin hooks: Campo tiene que poder usarse también desde un Server Component.
+  const idCampo = id ?? name
+  const idAyuda = ayuda && idCampo ? `${idCampo}-ayuda` : undefined
+  const idError = error && idCampo ? `${idCampo}-error` : undefined
+  const descrito = [idAyuda, idError].filter(Boolean).join(' ') || undefined
+
   return (
-    <label className="block">
-      <span className="mb-1 block text-sm font-medium text-zinc-700">{etiqueta}</span>
+    <div className="block">
+      <label htmlFor={idCampo} className="mb-1 block text-sm font-medium text-tinta-sup">
+        {etiqueta}
+      </label>
       <input
         {...props}
+        id={idCampo}
+        name={name}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={descrito}
         className={clsx(
-          'block w-full min-h-11 rounded-lg border px-3 text-base',
-          'focus:outline-none focus:ring-2 focus:ring-zinc-900',
-          error ? 'border-red-400' : 'border-zinc-300',
+          'block min-h-11 w-full rounded-marca border bg-papel px-3 text-base text-tinta',
+          'placeholder:text-lapiz/70',
+          error ? 'border-falta' : 'border-renglon',
           className,
         )}
       />
-      {error && <span className="mt-1 block text-sm text-red-600">{error}</span>}
-    </label>
+      {ayuda && !error && (
+        <span id={idAyuda} className="mt-1 block text-sm text-lapiz">
+          {ayuda}
+        </span>
+      )}
+      {error && (
+        <span id={idError} className="mt-1 block text-sm text-falta">
+          {error}
+        </span>
+      )}
+    </div>
   )
 }

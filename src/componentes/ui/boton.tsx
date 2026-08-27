@@ -1,25 +1,40 @@
 import { clsx } from 'clsx'
 
 type Variante = 'primario' | 'secundario' | 'peligro'
+type Tamano = 'normal' | 'grande'
 
+// El botón primario es tinta, no azul: el azul birome es el acento de la marca
+// (logo, links) y el manual pide un solo acento por pantalla.
 const ESTILOS: Record<Variante, string> = {
-  primario: 'bg-zinc-900 text-white hover:bg-zinc-800',
-  secundario: 'bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-50',
-  peligro: 'bg-white text-red-700 border border-red-300 hover:bg-red-50',
+  primario: 'bg-tinta text-papel hover:opacity-90',
+  secundario: 'bg-transparent text-tinta border border-renglon hover:bg-papel-alt',
+  peligro: 'bg-transparent text-falta border border-falta/40 hover:bg-falta-sup',
+}
+
+// 44 px es el mínimo táctil; 56 px es lo que pide el manual para lo que se
+// aprieta con el pulgar, parado, entre paciente y paciente.
+const TAMANOS: Record<Tamano, string> = {
+  normal: 'min-h-11 px-4 text-sm',
+  grande: 'min-h-14 px-5 text-base',
 }
 
 export function Boton({
   variante = 'primario',
+  tamano = 'normal',
   className,
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variante?: Variante }) {
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variante?: Variante
+  tamano?: Tamano
+}) {
   return (
     <button
       {...props}
       className={clsx(
-        'inline-flex min-h-11 items-center justify-center rounded-lg px-4 text-sm font-medium',
-        'transition-colors disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center rounded-marca font-medium',
+        'transition-[opacity,background-color] disabled:pointer-events-none disabled:opacity-50',
         ESTILOS[variante],
+        TAMANOS[tamano],
         className,
       )}
     />
