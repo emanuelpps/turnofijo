@@ -1,0 +1,1066 @@
+<title>Manual de marca Turno Fijo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Chivo:ital,wght@0,300..800;1,400&display=swap">
+
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Tokens. El bloque :root define la paleta clara completa.
+     Los dos bloques de abajo sólo redefinen tokens, nunca componentes.
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --papel:      #F6F7F3;
+    --papel-alt:  #EDEFE8;
+    --tinta:      #141C28;
+    --tinta-sup:  #3A4657;
+    --lapiz:      #6C7689;
+    --renglon:    #D3D8CE;
+    --birome:     #1D45A6;
+    --birome-sup: #E4E9F7;
+
+    --vino:   #2E7D5B;
+    --falta:  #B23A2E;
+    --espera: #B5822A;
+
+    --sombra: 0 1px 2px rgba(20, 28, 40, .06);
+    --radio: 10px;
+
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --texto: "Chivo", "Helvetica Neue", Arial, sans-serif;
+
+    --ancho: 62rem;
+    --lectura: 34rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --papel:      #0F141C;
+      --papel-alt:  #161D28;
+      --tinta:      #E7EAE4;
+      --tinta-sup:  #B4BCC7;
+      --lapiz:      #8A94A5;
+      --renglon:    #2A3341;
+      --birome:     #8FA9F2;
+      --birome-sup: #1B2540;
+
+      --vino:   #63BC94;
+      --falta:  #E8837A;
+      --espera: #DFB05C;
+
+      --sombra: 0 1px 2px rgba(0, 0, 0, .4);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --papel:      #0F141C;
+    --papel-alt:  #161D28;
+    --tinta:      #E7EAE4;
+    --tinta-sup:  #B4BCC7;
+    --lapiz:      #8A94A5;
+    --renglon:    #2A3341;
+    --birome:     #8FA9F2;
+    --birome-sup: #1B2540;
+
+    --vino:   #63BC94;
+    --falta:  #E8837A;
+    --espera: #DFB05C;
+
+    --sombra: 0 1px 2px rgba(0, 0, 0, .4);
+  }
+
+  /* ───────────────────────────── base ───────────────────────────── */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: var(--texto);
+    font-size: 16.5px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .envoltorio {
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 0 1.5rem 6rem;
+  }
+
+  h1, h2, h3, .display {
+    font-family: var(--display);
+    font-variation-settings: "wdth" 116;
+    text-wrap: balance;
+    line-height: 1.08;
+    margin: 0;
+  }
+
+  p { margin: 0; max-width: var(--lectura); }
+  a { color: var(--birome); }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--birome);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  code, .mono {
+    font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, monospace;
+    font-size: .86em;
+    background: var(--papel-alt);
+    padding: .12em .38em;
+    border-radius: 4px;
+  }
+
+  .etiqueta {
+    font-family: var(--texto);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--lapiz);
+  }
+
+  /* ───────────────────────────── portada ───────────────────────────── */
+  .portada {
+    display: grid;
+    gap: 2.5rem;
+    padding: 4.5rem 0 3.5rem;
+    border-bottom: 1px solid var(--renglon);
+  }
+
+  .portada__marca { display: flex; align-items: center; gap: 1.1rem; }
+
+  .portada h1 {
+    font-size: clamp(2.6rem, 7vw, 4.4rem);
+    font-weight: 800;
+    font-variation-settings: "wdth" 122;
+    letter-spacing: -.022em;
+  }
+
+  .portada__bajada {
+    font-size: 1.16rem;
+    color: var(--tinta-sup);
+    max-width: 40rem;
+  }
+
+  .portada__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.6rem;
+    padding-top: .5rem;
+  }
+  .portada__meta div { display: grid; gap: .1rem; }
+  .portada__meta span:last-child { font-weight: 600; }
+
+  /* ─────────────── índice ─────────────── */
+  .indice {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 0;
+    border-bottom: 1px solid var(--renglon);
+  }
+  .indice a {
+    display: flex;
+    align-items: baseline;
+    gap: .7rem;
+    padding: 1rem .4rem;
+    color: var(--tinta);
+    text-decoration: none;
+    border-top: 1px solid var(--renglon);
+    font-weight: 500;
+  }
+  .indice a:hover { color: var(--birome); }
+  .indice a span:first-child {
+    font-family: var(--display);
+    font-variation-settings: "wdth" 100;
+    font-weight: 700;
+    color: var(--birome);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─────────────── secciones ─────────────── */
+  .seccion {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0 2rem;
+    padding: 4rem 0 1rem;
+    border-top: 1px solid var(--renglon);
+    scroll-margin-top: 1rem;
+  }
+  .seccion:first-of-type { border-top: 0; }
+
+  .seccion__numero {
+    font-family: var(--display);
+    font-variation-settings: "wdth" 100;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--birome);
+    font-variant-numeric: tabular-nums;
+    padding-top: .25rem;
+  }
+
+  .seccion__cuerpo { display: grid; gap: 1.5rem; min-width: 0; }
+
+  .seccion h2 {
+    font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+    font-weight: 700;
+    letter-spacing: -.018em;
+  }
+
+  h3 {
+    font-size: 1.12rem;
+    font-weight: 700;
+    font-variation-settings: "wdth" 108;
+    margin-top: .8rem;
+  }
+
+  .apunte {
+    color: var(--lapiz);
+    font-size: .92rem;
+    max-width: var(--lectura);
+  }
+
+  @media (max-width: 46rem) {
+    .seccion { grid-template-columns: 1fr; gap: .6rem; }
+    .seccion__numero { padding-top: 0; font-size: 1.1rem; }
+  }
+
+  /* ─────────────── piezas ─────────────── */
+  .tarjeta {
+    background: var(--papel-alt);
+    border: 1px solid var(--renglon);
+    border-radius: var(--radio);
+    padding: 1.5rem;
+  }
+
+  .rejilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 1rem;
+  }
+
+  .muestrario {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1px;
+    background: var(--renglon);
+    border: 1px solid var(--renglon);
+    border-radius: var(--radio);
+    overflow: hidden;
+  }
+  .muestra { background: var(--papel); padding: 1.1rem; display: grid; gap: .55rem; }
+  .muestra__chip { height: 3.4rem; border-radius: 7px; border: 1px solid rgba(128,128,128,.18); }
+  .muestra__nombre { font-weight: 700; font-size: .95rem; }
+  .muestra__datos {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: .74rem;
+    color: var(--lapiz);
+    display: grid;
+    gap: .1rem;
+  }
+
+  .lienzo {
+    display: grid;
+    place-items: center;
+    gap: .9rem;
+    padding: 2rem 1rem;
+    border: 1px solid var(--renglon);
+    border-radius: var(--radio);
+    background: var(--papel-alt);
+    text-align: center;
+  }
+  .lienzo--oscuro { background: #0F141C; border-color: #2A3341; color: #E7EAE4; }
+  .lienzo--tinta  { background: var(--birome); border-color: transparent; color: #fff; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+  th, td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--renglon); vertical-align: top; }
+  th { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--lapiz); font-weight: 700; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .desliz { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .bien-mal { display: grid; gap: 1px; background: var(--renglon); border: 1px solid var(--renglon); border-radius: var(--radio); overflow: hidden; }
+  .bien-mal > div { background: var(--papel); padding: .95rem 1.1rem; display: grid; gap: .25rem; }
+  .bien-mal .marca-si { color: var(--vino); font-weight: 700; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; }
+  .bien-mal .marca-no { color: var(--falta); font-weight: 700; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; }
+
+  pre {
+    margin: 0;
+    background: var(--papel-alt);
+    border: 1px solid var(--renglon);
+    border-radius: var(--radio);
+    padding: 1.1rem 1.2rem;
+    overflow-x: auto;
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: .8rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--tinta);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  .prompt { display: grid; gap: .55rem; }
+  .prompt__cabeza { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .prompt__cabeza h3 { margin: 0; }
+  .prompt__herramienta {
+    font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--birome); background: var(--birome-sup);
+    padding: .18rem .5rem; border-radius: 999px;
+  }
+
+  ul { margin: 0; padding-left: 1.15rem; max-width: var(--lectura); }
+  li { margin-bottom: .35rem; }
+  li::marker { color: var(--birome); }
+
+  .fuera { color: var(--lapiz); }
+
+  /* mockups */
+  .telefono {
+    width: 15rem;
+    border: 1px solid var(--renglon);
+    border-radius: 20px;
+    background: var(--papel);
+    padding: .8rem;
+    box-shadow: var(--sombra);
+    font-size: .8rem;
+  }
+  .telefono__barra { display: flex; align-items: center; gap: .45rem; padding-bottom: .6rem; border-bottom: 1px solid var(--renglon); margin-bottom: .7rem; }
+  .turno-mock { border: 1px solid var(--renglon); border-radius: 9px; padding: .6rem .7rem; margin-bottom: .5rem; }
+  .turno-mock strong { font-size: 1.3rem; font-variant-numeric: tabular-nums; font-family: var(--display); font-weight: 700; }
+  .turno-mock--vino { border-color: var(--vino); background: color-mix(in srgb, var(--vino) 10%, transparent); }
+  .botonera { display: flex; gap: .35rem; margin-top: .5rem; }
+  .botonera span { flex: 1; text-align: center; padding: .45rem; border-radius: 7px; font-weight: 600; font-size: .74rem; }
+  .botonera span:first-child { background: var(--tinta); color: var(--papel); }
+  .botonera span:last-child { border: 1px solid var(--renglon); }
+
+  .whatsapp-mock {
+    max-width: 20rem;
+    background: var(--papel-alt);
+    border: 1px solid var(--renglon);
+    border-radius: 12px 12px 12px 3px;
+    padding: .85rem 1rem;
+    font-size: .87rem;
+    line-height: 1.5;
+  }
+  .whatsapp-mock__botones { display: grid; gap: .3rem; margin-top: .7rem; padding-top: .6rem; border-top: 1px solid var(--renglon); }
+  .whatsapp-mock__botones span { text-align: center; color: var(--birome); font-weight: 600; font-size: .84rem; }
+
+  /* animación de portada */
+  .casillero-anim { animation: aparecer .5s ease-out backwards; }
+  .casillero-anim:nth-of-type(1) { animation-delay: .05s; }
+  .casillero-anim:nth-of-type(2) { animation-delay: .18s; }
+  .casillero-anim:nth-of-type(3) { animation-delay: .31s; }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .casillero-anim { animation: none; }
+  }
+
+  footer {
+    border-top: 1px solid var(--renglon);
+    margin-top: 4rem;
+    padding-top: 1.6rem;
+    color: var(--lapiz);
+    font-size: .88rem;
+  }
+</style>
+
+<div class="envoltorio">
+
+  <!-- ══════════════════ PORTADA ══════════════════ -->
+  <header class="portada">
+    <div class="portada__marca">
+      <svg width="60" height="60" viewBox="0 0 48 48" role="img" aria-label="Isotipo de Turno Fijo">
+        <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".26">
+          <line x1="4" y1="12" x2="44" y2="12"></line>
+          <line x1="4" y1="24" x2="44" y2="24"></line>
+          <line x1="4" y1="36" x2="44" y2="36"></line>
+        </g>
+        <g fill="var(--birome)">
+          <rect class="casillero-anim" x="25" y="7"  width="10" height="10" rx="3"></rect>
+          <rect class="casillero-anim" x="25" y="19" width="10" height="10" rx="3"></rect>
+          <rect class="casillero-anim" x="25" y="31" width="10" height="10" rx="3"></rect>
+        </g>
+      </svg>
+      <span class="etiqueta">Manual de marca · v1</span>
+    </div>
+
+    <h1>Turno&nbsp;Fijo</h1>
+
+    <p class="portada__bajada">
+      La agenda de los que atienden solos. Este documento define cómo se ve, cómo suena
+      y cómo se aplica la marca — para que dentro de dos años siga siendo la misma.
+    </p>
+
+    <div class="portada__meta">
+      <div><span class="etiqueta">Producto</span><span>Agenda de turnos recurrentes</span></div>
+      <div><span class="etiqueta">Mercado</span><span>General Roca, Río Negro</span></div>
+      <div><span class="etiqueta">Público</span><span>Psicólogos y nutricionistas</span></div>
+      <div><span class="etiqueta">Fecha</span><span>24 de agosto de 2026</span></div>
+    </div>
+  </header>
+
+  <!-- ══════════════════ ÍNDICE ══════════════════ -->
+  <nav class="indice" aria-label="Contenido">
+    <a href="#marca"><span>01</span><span>La marca</span></a>
+    <a href="#nombre"><span>02</span><span>El nombre</span></a>
+    <a href="#logo"><span>03</span><span>El logo</span></a>
+    <a href="#color"><span>04</span><span>Color</span></a>
+    <a href="#tipografia"><span>05</span><span>Tipografía</span></a>
+    <a href="#voz"><span>06</span><span>Tono de voz</span></a>
+    <a href="#aplicaciones"><span>07</span><span>Aplicaciones</span></a>
+    <a href="#prompts"><span>08</span><span>Generar el logo con IA</span></a>
+  </nav>
+
+  <!-- ══════════════════ 01 · LA MARCA ══════════════════ -->
+  <section class="seccion" id="marca">
+    <div class="seccion__numero">01</div>
+    <div class="seccion__cuerpo">
+      <h2>La marca</h2>
+
+      <p>
+        Turno Fijo es la agenda de un profesional que atiende solo, sin secretaria, y que entre
+        paciente y paciente tiene dos minutos. Psicólogos y nutricionistas que cobran particular
+        y trabajan con sesiones que se repiten: el mismo día, a la misma hora, durante meses o años.
+      </p>
+
+      <h3>La promesa, en una línea</h3>
+      <p style="font-family: var(--display); font-variation-settings: 'wdth' 112; font-size: 1.42rem; font-weight: 600; line-height: 1.3;">
+        Tu semana ya está armada. Nosotros nos ocupamos de que se cumpla.
+      </p>
+
+      <h3>De qué se despega</h3>
+      <p>
+        La categoría entera —Turnera, Turnito, AgendaPro, Doctoralia— habla el mismo idioma:
+        azul corporativo, sans geométrico, stock de gente sonriendo con guardapolvo, precios en
+        dólares y soporte que contesta en tres días. Turno Fijo es lo contrario en las cuatro
+        cosas, y la identidad tiene que decirlo antes de que alguien lea una palabra.
+      </p>
+
+      <div class="bien-mal">
+        <div>
+          <span class="marca-si">Es</span>
+          <span>Vecina. Concreta. Ordenada. Habla como habla un profesional del Alto Valle.</span>
+        </div>
+        <div>
+          <span class="marca-no">No es</span>
+          <span>Clínica ni hospitalaria. Ni startup con gradientes. Ni una app de bienestar.</span>
+        </div>
+      </div>
+
+      <h3>Los tres pilares</h3>
+      <ul>
+        <li><strong>Precio plano en pesos, con los recordatorios adentro.</strong> Nadie más lo hace: todos cobran el mensaje aparte.</li>
+        <li><strong>Estamos acá.</strong> Ninguna plataforma global va a ir a un consultorio de General Roca. Nosotros sí.</li>
+        <li><strong>La serie es la unidad.</strong> No se carga turno por turno: se carga el martes a las tres, y listo.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 02 · EL NOMBRE ══════════════════ -->
+  <section class="seccion" id="nombre">
+    <div class="seccion__numero">02</div>
+    <div class="seccion__cuerpo">
+      <h2>El nombre</h2>
+
+      <p>
+        <strong>Turno fijo</strong> es una expresión que en Argentina ya existe y ya significa
+        exactamente esto: el horario que un paciente tiene reservado siempre. No hubo que inventar
+        una palabra ni forzar una metáfora — el nombre nombra el producto.
+      </p>
+
+      <p>
+        También lo despega de <span class="fuera">Turnera, Turnito, Citalo, TurneroMed</span>:
+        todos derivados de "turno" con un sufijo. Turno Fijo no es un diminutivo de nada.
+      </p>
+
+      <div class="desliz">
+        <table>
+          <thead>
+            <tr><th>Regla</th><th>Correcto</th><th>Incorrecto</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Dos palabras, siempre</td><td>Turno Fijo</td><td class="fuera">TurnoFijo · Turnofijo</td></tr>
+            <tr><td>Ambas en mayúscula inicial</td><td>Turno Fijo</td><td class="fuera">turno fijo · TURNO FIJO en texto corrido</td></tr>
+            <tr><td>Sin abreviar</td><td>Turno Fijo</td><td class="fuera">TF · T. Fijo</td></tr>
+            <tr><td>Sin traducir</td><td>Turno Fijo</td><td class="fuera">Fixed Slot · Turno Fijo App</td></tr>
+            <tr><td>Dominio y usuario</td><td class="mono">turnofijo.com.ar · @turnofijo</td><td class="fuera">turno-fijo</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="apunte">
+        Pendiente antes de imprimir nada: confirmar <code>turnofijo.com.ar</code> en NIC.ar
+        (pide CUIT) y buscar la marca en el INPI. Que el dominio no resuelva no quiere decir
+        que esté libre.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 03 · EL LOGO ══════════════════ -->
+  <section class="seccion" id="logo">
+    <div class="seccion__numero">03</div>
+    <div class="seccion__cuerpo">
+      <h2>El logo</h2>
+
+      <h3>La idea</h3>
+      <p>
+        Tres renglones —tres semanas— y el mismo casillero marcado en las tres, alineado.
+        Eso es un turno fijo, dibujado. No es un calendario genérico ni un reloj: es la
+        repetición en el mismo lugar, que es todo el producto en una figura.
+      </p>
+      <p class="apunte">
+        El casillero está a la derecha del centro, no centrado. Un turno cae donde cae en la
+        semana; la simetría perfecta contaría otra cosa.
+      </p>
+
+      <div class="rejilla">
+        <div class="lienzo">
+          <svg width="76" height="76" viewBox="0 0 48 48" role="img" aria-label="Isotipo">
+            <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".26">
+              <line x1="4" y1="12" x2="44" y2="12"></line>
+              <line x1="4" y1="24" x2="44" y2="24"></line>
+              <line x1="4" y1="36" x2="44" y2="36"></line>
+            </g>
+            <g fill="var(--birome)">
+              <rect x="25" y="7"  width="10" height="10" rx="3"></rect>
+              <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+              <rect x="25" y="31" width="10" height="10" rx="3"></rect>
+            </g>
+          </svg>
+          <span class="etiqueta">Isotipo</span>
+        </div>
+
+        <div class="lienzo">
+          <svg width="80" height="80" viewBox="0 0 48 48" role="img" aria-label="Ícono de aplicación">
+            <rect width="48" height="48" rx="11" fill="var(--birome)"></rect>
+            <g stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".42">
+              <line x1="9" y1="14" x2="39" y2="14"></line>
+              <line x1="9" y1="24" x2="39" y2="24"></line>
+              <line x1="9" y1="34" x2="39" y2="34"></line>
+            </g>
+            <g fill="#fff">
+              <rect x="25" y="9.5"  width="9" height="9" rx="2.6"></rect>
+              <rect x="25" y="19.5" width="9" height="9" rx="2.6"></rect>
+              <rect x="25" y="29.5" width="9" height="9" rx="2.6"></rect>
+            </g>
+          </svg>
+          <span class="etiqueta">Ícono de app</span>
+        </div>
+
+        <div class="lienzo lienzo--oscuro">
+          <svg width="76" height="76" viewBox="0 0 48 48" role="img" aria-label="Isotipo sobre fondo oscuro">
+            <g stroke="#E7EAE4" stroke-width="2.4" stroke-linecap="round" opacity=".3">
+              <line x1="4" y1="12" x2="44" y2="12"></line>
+              <line x1="4" y1="24" x2="44" y2="24"></line>
+              <line x1="4" y1="36" x2="44" y2="36"></line>
+            </g>
+            <g fill="#8FA9F2">
+              <rect x="25" y="7"  width="10" height="10" rx="3"></rect>
+              <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+              <rect x="25" y="31" width="10" height="10" rx="3"></rect>
+            </g>
+          </svg>
+          <span class="etiqueta" style="color:#8A94A5">Sobre fondo oscuro</span>
+        </div>
+      </div>
+
+      <h3>Logotipo horizontal</h3>
+      <p>La versión principal. Es la que va en la app, en la web y en cualquier documento.</p>
+
+      <div class="lienzo" style="padding: 2.6rem 1rem;">
+        <svg width="290" height="60" viewBox="0 0 232 48" role="img" aria-label="Turno Fijo">
+          <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".26">
+            <line x1="4" y1="12" x2="44" y2="12"></line>
+            <line x1="4" y1="24" x2="44" y2="24"></line>
+            <line x1="4" y1="36" x2="44" y2="36"></line>
+          </g>
+          <g fill="var(--birome)">
+            <rect x="25" y="7"  width="10" height="10" rx="3"></rect>
+            <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+            <rect x="25" y="31" width="10" height="10" rx="3"></rect>
+          </g>
+          <text x="59" y="32.5" fill="currentColor"
+                style="font-family: Archivo, sans-serif; font-variation-settings: 'wdth' 120; font-weight: 800; font-size: 25px; letter-spacing: -.4px;">Turno Fijo</text>
+        </svg>
+      </div>
+
+      <div class="lienzo lienzo--tinta" style="padding: 2.6rem 1rem;">
+        <svg width="290" height="60" viewBox="0 0 232 48" role="img" aria-label="Turno Fijo en negativo">
+          <g stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".45">
+            <line x1="4" y1="12" x2="44" y2="12"></line>
+            <line x1="4" y1="24" x2="44" y2="24"></line>
+            <line x1="4" y1="36" x2="44" y2="36"></line>
+          </g>
+          <g fill="#fff">
+            <rect x="25" y="7"  width="10" height="10" rx="3"></rect>
+            <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+            <rect x="25" y="31" width="10" height="10" rx="3"></rect>
+          </g>
+          <text x="59" y="32.5" fill="#fff"
+                style="font-family: Archivo, sans-serif; font-variation-settings: 'wdth' 120; font-weight: 800; font-size: 25px; letter-spacing: -.4px;">Turno Fijo</text>
+        </svg>
+        <span class="etiqueta" style="color: rgba(255,255,255,.7)">Negativo, sobre el azul de marca</span>
+      </div>
+
+      <h3>Construcción</h3>
+      <div class="desliz">
+        <table>
+          <thead><tr><th>Medida</th><th>Valor</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Módulo <span class="mono">x</span></td><td class="num">lado del casillero</td><td>Todo se mide en casilleros. Es la unidad del producto.</td></tr>
+            <tr><td>Separación entre renglones</td><td class="num">1,2 x</td><td>Deja respirar sin que se lea como tres marcas sueltas.</td></tr>
+            <tr><td>Radio del casillero</td><td class="num">0,3 x</td><td>Redondeado, no pastilla. Un casillero, no un botón.</td></tr>
+            <tr><td>Grosor del renglón</td><td class="num">0,24 x</td><td>Hairline: es el papel, no el dato.</td></tr>
+            <tr><td>Aire entre isotipo y palabra</td><td class="num">1,5 x</td><td>Menos que eso y se leen como una sola forma.</td></tr>
+            <tr><td>Área de resguardo</td><td class="num">1 x en los cuatro lados</td><td>Nada entra ahí. Ni texto, ni bordes, ni otra marca.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Tamaños mínimos</h3>
+      <div class="rejilla">
+        <div class="tarjeta">
+          <div class="etiqueta">Isotipo</div>
+          <p style="margin-top:.4rem"><strong>16 px</strong> en pantalla · <strong>6 mm</strong> impreso.<br>
+          Abajo de eso los renglones desaparecen y quedan tres cuadraditos sin sentido.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="etiqueta">Logotipo horizontal</div>
+          <p style="margin-top:.4rem"><strong>96 px</strong> de ancho · <strong>26 mm</strong> impreso.<br>
+          Si no entra, se usa el isotipo solo. Nunca se achica la palabra hasta que no se lea.</p>
+        </div>
+      </div>
+
+      <h3>Usos incorrectos</h3>
+      <div class="rejilla">
+        <div class="lienzo">
+          <svg width="70" height="70" viewBox="0 0 48 48" role="img" aria-label="Casilleros desalineados, incorrecto">
+            <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".26">
+              <line x1="4" y1="12" x2="44" y2="12"></line><line x1="4" y1="24" x2="44" y2="24"></line><line x1="4" y1="36" x2="44" y2="36"></line>
+            </g>
+            <g fill="var(--falta)">
+              <rect x="12" y="7" width="10" height="10" rx="3"></rect>
+              <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+              <rect x="33" y="31" width="10" height="10" rx="3"></rect>
+            </g>
+          </svg>
+          <span class="etiqueta" style="color: var(--falta)">Desalineados</span>
+          <p class="apunte" style="font-size:.82rem">El peor de todos: rompe el significado, no la estética.</p>
+        </div>
+        <div class="lienzo">
+          <svg width="70" height="70" viewBox="0 0 48 48" role="img" aria-label="Con degradado, incorrecto">
+            <defs><linearGradient id="malGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#8B5CF6"></stop><stop offset="100%" stop-color="#22D3EE"></stop>
+            </linearGradient></defs>
+            <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".26">
+              <line x1="4" y1="12" x2="44" y2="12"></line><line x1="4" y1="24" x2="44" y2="24"></line><line x1="4" y1="36" x2="44" y2="36"></line>
+            </g>
+            <g fill="url(#malGrad)">
+              <rect x="25" y="7" width="10" height="10" rx="3"></rect>
+              <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+              <rect x="25" y="31" width="10" height="10" rx="3"></rect>
+            </g>
+          </svg>
+          <span class="etiqueta" style="color: var(--falta)">Con degradado</span>
+          <p class="apunte" style="font-size:.82rem">El azul es plano. Siempre.</p>
+        </div>
+        <div class="lienzo">
+          <svg width="70" height="70" viewBox="0 0 48 48" role="img" aria-label="Rotado, incorrecto">
+            <g transform="rotate(-14 24 24)">
+              <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".26">
+                <line x1="4" y1="12" x2="44" y2="12"></line><line x1="4" y1="24" x2="44" y2="24"></line><line x1="4" y1="36" x2="44" y2="36"></line>
+              </g>
+              <g fill="var(--birome)">
+                <rect x="25" y="7" width="10" height="10" rx="3"></rect>
+                <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+                <rect x="25" y="31" width="10" height="10" rx="3"></rect>
+              </g>
+            </g>
+          </svg>
+          <span class="etiqueta" style="color: var(--falta)">Rotado o inclinado</span>
+          <p class="apunte" style="font-size:.82rem">Los renglones son horizontales, como en un cuaderno.</p>
+        </div>
+        <div class="lienzo">
+          <svg width="70" height="70" viewBox="0 0 48 48" role="img" aria-label="Deformado, incorrecto">
+            <g transform="translate(24 24) scale(1.35 .72) translate(-24 -24)">
+              <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".26">
+                <line x1="4" y1="12" x2="44" y2="12"></line><line x1="4" y1="24" x2="44" y2="24"></line><line x1="4" y1="36" x2="44" y2="36"></line>
+              </g>
+              <g fill="var(--birome)">
+                <rect x="25" y="7" width="10" height="10" rx="3"></rect>
+                <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+                <rect x="25" y="31" width="10" height="10" rx="3"></rect>
+              </g>
+            </g>
+          </svg>
+          <span class="etiqueta" style="color: var(--falta)">Estirado</span>
+          <p class="apunte" style="font-size:.82rem">Escalar siempre proporcional.</p>
+        </div>
+      </div>
+
+      <p class="apunte">
+        También quedan afuera: sombras y relieves, contornos alrededor del logotipo, cambiar la
+        tipografía de la palabra, encerrar el isotipo en un círculo, y ponerlo sobre una foto sin
+        una capa que garantice el contraste.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 04 · COLOR ══════════════════ -->
+  <section class="seccion" id="color">
+    <div class="seccion__numero">04</div>
+    <div class="seccion__cuerpo">
+      <h2>Color</h2>
+
+      <p>
+        El azul no es el azul corporativo de la categoría: es el azul de la birome con la que un
+        profesional anota un turno en la agenda de papel que este producto viene a reemplazar.
+        Sobre un blanco frío de cuaderno, no sobre crema.
+      </p>
+
+      <div class="muestrario">
+        <div class="muestra">
+          <div class="muestra__chip" style="background:#1D45A6"></div>
+          <div class="muestra__nombre">Azul birome</div>
+          <div class="muestra__datos"><span>#1D45A6</span><span>Acento. Logo, links, acciones.</span></div>
+        </div>
+        <div class="muestra">
+          <div class="muestra__chip" style="background:#141C28"></div>
+          <div class="muestra__nombre">Tinta</div>
+          <div class="muestra__datos"><span>#141C28</span><span>Texto y botón primario.</span></div>
+        </div>
+        <div class="muestra">
+          <div class="muestra__chip" style="background:#F6F7F3"></div>
+          <div class="muestra__nombre">Papel</div>
+          <div class="muestra__datos"><span>#F6F7F3</span><span>Fondo. Frío, no crema.</span></div>
+        </div>
+        <div class="muestra">
+          <div class="muestra__chip" style="background:#6C7689"></div>
+          <div class="muestra__nombre">Lápiz</div>
+          <div class="muestra__datos"><span>#6C7689</span><span>Texto secundario, ayudas.</span></div>
+        </div>
+        <div class="muestra">
+          <div class="muestra__chip" style="background:#D3D8CE"></div>
+          <div class="muestra__nombre">Renglón</div>
+          <div class="muestra__datos"><span>#D3D8CE</span><span>Bordes y separadores.</span></div>
+        </div>
+      </div>
+
+      <h3>Colores de estado</h3>
+      <p>
+        Van aparte del acento y no se usan nunca como color de marca. Cada uno corresponde
+        exactamente a un estado del turno en el producto, y a ninguna otra cosa.
+      </p>
+
+      <div class="muestrario">
+        <div class="muestra">
+          <div class="muestra__chip" style="background:#2E7D5B"></div>
+          <div class="muestra__nombre">Vino</div>
+          <div class="muestra__datos"><span>#2E7D5B</span><span>confirmado · asistió</span></div>
+        </div>
+        <div class="muestra">
+          <div class="muestra__chip" style="background:#B5822A"></div>
+          <div class="muestra__nombre">En espera</div>
+          <div class="muestra__datos"><span>#B5822A</span><span>avisado, sin respuesta</span></div>
+        </div>
+        <div class="muestra">
+          <div class="muestra__chip" style="background:#B23A2E"></div>
+          <div class="muestra__nombre">Faltó</div>
+          <div class="muestra__datos"><span>#B23A2E</span><span>ausente · falló el aviso</span></div>
+        </div>
+      </div>
+
+      <h3>Reglas</h3>
+      <ul>
+        <li>Un solo acento por pantalla. Si el azul compite con otra cosa, gana el azul y la otra se apaga.</li>
+        <li>Nada de degradados. El azul es plano en todos lados, sin excepción.</li>
+        <li>Texto sobre papel y sobre azul: mínimo 4.5:1. Los estados nunca son el único indicador — siempre van con la palabra al lado, porque una parte de los usuarios no distingue verde de rojo.</li>
+        <li>En modo oscuro el fondo es pizarra <span class="mono">#0F141C</span> y el azul sube a <span class="mono">#8FA9F2</span>. El azul de marca no tiene contraste suficiente sobre oscuro y usarlo igual es el error más común.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 05 · TIPOGRAFÍA ══════════════════ -->
+  <section class="seccion" id="tipografia">
+    <div class="seccion__numero">05</div>
+    <div class="seccion__cuerpo">
+      <h2>Tipografía</h2>
+
+      <p>
+        Las dos familias son de <strong>Omnibus-Type</strong>, fundición de Buenos Aires. No es un
+        dato decorativo: una marca que se vende diciendo "estamos acá" no puede estar escrita con
+        la tipografía por defecto de todo el mundo.
+      </p>
+
+      <div class="rejilla">
+        <div class="tarjeta">
+          <div class="etiqueta">Títulos y logotipo</div>
+          <p style="font-family: var(--display); font-variation-settings:'wdth' 122; font-weight:800; font-size:2.4rem; line-height:1.05; margin:.4rem 0 .5rem;">Archivo</p>
+          <p class="apunte">Ancho 116–125, peso 700–800. Ancha y firme, como el cartel en la puerta de un consultorio. Nunca por debajo de ancho 100.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="etiqueta">Texto, interfaz y datos</div>
+          <p style="font-family: var(--texto); font-weight:400; font-size:2.4rem; line-height:1.05; margin:.4rem 0 .5rem;">Chivo</p>
+          <p class="apunte">Pesos 300–700. Números tabulares siempre que haya horas en columna — que es casi toda la app.</p>
+        </div>
+      </div>
+
+      <h3>Escala</h3>
+      <div class="desliz">
+        <table>
+          <thead><tr><th>Rol</th><th>Familia</th><th>Tamaño</th><th>Dónde</th></tr></thead>
+          <tbody>
+            <tr><td>Título de pantalla</td><td>Archivo 700</td><td class="num">28 / 34 px</td><td>"Agenda", "Pacientes"</td></tr>
+            <tr><td>La hora del turno</td><td>Archivo 700, tabular</td><td class="num">24 px</td><td>Pantalla del día — es el dato héroe</td></tr>
+            <tr><td>Nombre del paciente</td><td>Chivo 600</td><td class="num">17 px</td><td>Listas y tarjetas</td></tr>
+            <tr><td>Texto corriente</td><td>Chivo 400</td><td class="num">16 px</td><td>Todo lo demás</td></tr>
+            <tr><td>Ayuda y secundarios</td><td>Chivo 400</td><td class="num">14 px</td><td>Bajo los campos, en gris lápiz</td></tr>
+            <tr><td>Etiquetas</td><td>Chivo 700, +0.13em</td><td class="num">11 px</td><td>Versalitas, siempre en gris lápiz</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <pre><code>&lt;link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=Chivo:ital,wght@0,300..800;1,400&amp;display=swap"&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 06 · TONO DE VOZ ══════════════════ -->
+  <section class="seccion" id="voz">
+    <div class="seccion__numero">06</div>
+    <div class="seccion__cuerpo">
+      <h2>Tono de voz</h2>
+
+      <p>
+        Voseo rioplatense, siempre. Frases cortas. Se dice qué pasó y qué hacer, en ese orden.
+        No se pide perdón, no se explica la arquitectura y no se usa jerga: ni médica ni de software.
+      </p>
+
+      <div class="bien-mal">
+        <div><span class="marca-si">Así</span><span>Ya tenés otro turno en ese horario.</span></div>
+        <div><span class="marca-no">Así no</span><span class="fuera">Error 409: conflicto de superposición en la agenda.</span></div>
+        <div><span class="marca-si">Así</span><span>Ese teléfono no se entiende. Ejemplo: 2984 12-3456.</span></div>
+        <div><span class="marca-no">Así no</span><span class="fuera">El campo teléfono no cumple el formato requerido (E.164).</span></div>
+        <div><span class="marca-si">Así</span><span>Ojo: quedaron 3 turnos agendados adentro de ese bloqueo.</span></div>
+        <div><span class="marca-no">Así no</span><span class="fuera">Advertencia: se han detectado citas dentro del período seleccionado.</span></div>
+        <div><span class="marca-si">Así</span><span>Tu semana, armada en dos minutos.</span></div>
+        <div><span class="marca-no">Así no</span><span class="fuera">La solución integral para la gestión de su consultorio.</span></div>
+      </div>
+
+      <h3>Palabras propias</h3>
+      <div class="desliz">
+        <table>
+          <thead><tr><th>Decimos</th><th>No decimos</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>turno</td><td class="fuera">cita, reserva, booking</td><td>Es la palabra que se usa acá.</td></tr>
+            <tr><td>paciente</td><td class="fuera">cliente, usuario</td><td>Del lado del profesional, es un paciente.</td></tr>
+            <tr><td>serie</td><td class="fuera">recurrencia, plan de sesiones</td><td>Simple y entendible sin explicación.</td></tr>
+            <tr><td>no vino</td><td class="fuera">inasistencia, no-show</td><td>Es lo que el profesional dice en voz alta.</td></tr>
+            <tr><td>aviso / recordatorio</td><td class="fuera">notificación push</td><td>Nadie llama "notificación" a un WhatsApp.</td></tr>
+            <tr><td>tu agenda</td><td class="fuera">el sistema, la plataforma</td><td>Es de él, no nuestra.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 07 · APLICACIONES ══════════════════ -->
+  <section class="seccion" id="aplicaciones">
+    <div class="seccion__numero">07</div>
+    <div class="seccion__cuerpo">
+      <h2>Aplicaciones</h2>
+
+      <h3>La pantalla del día</h3>
+      <p>
+        Es la pantalla que el profesional abre diez veces por jornada, parado, con una mano.
+        La hora en Archivo grande y tabular; los botones de 56 px de alto porque se aprietan
+        con el pulgar. Acá la marca se juega más que en cualquier logo.
+      </p>
+
+      <div class="lienzo" style="padding: 2rem 1rem;">
+        <div class="telefono">
+          <div class="telefono__barra">
+            <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+              <g stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".26">
+                <line x1="4" y1="12" x2="44" y2="12"></line><line x1="4" y1="24" x2="44" y2="24"></line><line x1="4" y1="36" x2="44" y2="36"></line>
+              </g>
+              <g fill="var(--birome)">
+                <rect x="25" y="7" width="10" height="10" rx="3"></rect>
+                <rect x="25" y="19" width="10" height="10" rx="3"></rect>
+                <rect x="25" y="31" width="10" height="10" rx="3"></rect>
+              </g>
+            </svg>
+            <strong style="font-family:var(--display); font-variation-settings:'wdth' 118; font-weight:700;">Martes 25</strong>
+            <span style="margin-left:auto; color:var(--lapiz); font-size:.72rem;">4 turnos · 2 sin marcar</span>
+          </div>
+
+          <div class="turno-mock turno-mock--vino">
+            <strong>15:00</strong> <span style="color:var(--lapiz)">a 15:50</span>
+            <span style="float:right; color:var(--vino); font-weight:600; font-size:.72rem;">confirmó</span>
+            <div style="font-weight:600; margin-top:.15rem;">María López ↻</div>
+            <div class="botonera"><span>Asistió</span><span>No vino</span></div>
+          </div>
+
+          <div class="turno-mock">
+            <strong>16:00</strong> <span style="color:var(--lapiz)">a 16:50</span>
+            <div style="font-weight:600; margin-top:.15rem;">Juan Pérez</div>
+            <div class="botonera"><span>Asistió</span><span>No vino</span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3>El recordatorio de WhatsApp</h3>
+      <p>
+        Sale del número del consultorio, no de un número nuestro: el paciente tiene que reconocer
+        de quién es el mensaje antes de leerlo. Por eso el nombre del profesional va primero y la
+        marca no aparece. La firma de Turno Fijo acá sería ruido.
+      </p>
+
+      <div class="lienzo" style="padding: 2rem 1rem;">
+        <div class="whatsapp-mock">
+          Hola María 👋 Te recuerdo tu sesión con la Lic. Ana Pérez<br>
+          <strong>mañana martes 25 a las 15:00</strong>.<br>
+          Contestá para confirmar o avisar si no podés venir.
+          <div class="whatsapp-mock__botones">
+            <span>Confirmar</span>
+            <span>No puedo ir</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Otras piezas</h3>
+      <div class="rejilla">
+        <div class="tarjeta">
+          <div class="etiqueta">Foto de perfil de WhatsApp</div>
+          <p style="margin-top:.4rem">El ícono de app, azul pleno, sin texto. A 96 px se tiene que reconocer igual.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="etiqueta">Sticker para el consultorio</div>
+          <p style="margin-top:.4rem">Logotipo horizontal en negativo sobre azul, con un QR al link de turnos. Va en la puerta o en el escritorio.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="etiqueta">Firma de mail</div>
+          <p style="margin-top:.4rem">Isotipo a 24 px + nombre en Archivo 700 + una línea en gris lápiz. Nada más.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="etiqueta">Presentación en el consultorio</div>
+          <p style="margin-top:.4rem">Impreso en A5, papel mate, una cara. El azul plano imprime bien en digital; no necesita Pantone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ 08 · PROMPTS DE IA ══════════════════ -->
+  <section class="seccion" id="prompts">
+    <div class="seccion__numero">08</div>
+    <div class="seccion__cuerpo">
+      <h2>Generar el logo con IA</h2>
+
+      <p>
+        Los generadores de imagen todavía no escriben texto confiable: van a devolver
+        "Tumo Fijo" o "Turno Fjio" media docena de veces. <strong>Generá solamente el isotipo</strong>
+        y armá la palabra aparte en Archivo. Es más rápido y el resultado es tipográficamente correcto.
+      </p>
+
+      <div class="prompt">
+        <div class="prompt__cabeza">
+          <h3>Recraft</h3>
+          <span class="prompt__herramienta">Vector nativo · recomendado</span>
+        </div>
+        <p class="apunte">Es el único que exporta SVG editable de verdad. Estilo: <em>Vector Illustration → Flat 2D / Icon</em>.</p>
+        <pre><code>Minimal flat vector app icon: three thin horizontal ruled lines
+stacked evenly, like the lines of a paper notebook, with three
+identical rounded squares aligned in a perfect vertical column,
+one sitting on each line, slightly right of center. Solid deep
+pen-blue squares (#1D45A6), light grey hairlines, off-white
+background (#F6F7F3). Geometric, precise, no gradients, no
+shadows, no text, no calendar grid, no clock. Flat 2D icon,
+centered, generous margin.</code></pre>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt__cabeza">
+          <h3>Midjourney</h3>
+          <span class="prompt__herramienta">v7</span>
+        </div>
+        <pre><code>flat minimal logo mark, three thin horizontal ruled lines like a
+paper agenda, three identical rounded squares perfectly aligned
+in a vertical column crossing the lines, deep pen blue on cool
+off-white, swiss graphic design, geometric precision, no text,
+no gradient, no shadow, vector style, centered
+--no text letters words calendar clock person gradient 3d shadow
+--style raw --stylize 120 --ar 1:1 --v 7</code></pre>
+        <p class="apunte">Sacá la mitad del prompt antes de agregarle nada: Midjourney se pone barroco con descripciones largas y termina dibujando un calendario.</p>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt__cabeza">
+          <h3>Ideogram</h3>
+          <span class="prompt__herramienta">El menos malo con texto</span>
+        </div>
+        <p class="apunte">Si igual querés probar el logotipo completo, es el que mejor escribe. Modo <em>Design</em>, aspecto 1:1.</p>
+        <pre><code>A minimalist logo for "Turno Fijo". Icon: three thin horizontal
+grey lines with three identical rounded blue squares aligned in
+one vertical column, one on each line. To the right, the words
+"Turno Fijo" in a wide bold geometric sans-serif, dark navy.
+Flat design, deep blue #1D45A6, off-white background, generous
+white space, no gradients, no shadows, professional and calm.</code></pre>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt__cabeza">
+          <h3>GPT Image / DALL·E</h3>
+          <span class="prompt__herramienta">Para explorar variantes</span>
+        </div>
+        <pre><code>Generá 4 variaciones de una marca gráfica plana y minimalista
+para una app de agenda de turnos recurrentes llamada Turno Fijo.
+
+Concepto obligatorio en todas: la repetición alineada — algo que
+se repite exactamente en el mismo lugar, tres veces.
+
+Reglas: sin texto, sin degradados, sin sombras, sin 3D, sin
+íconos de calendario ni de reloj ni de personas. Un solo color
+sólido (azul #1D45A6) sobre fondo blanco frío (#F6F7F3).
+Formas geométricas simples, legible a 16 píxeles.
+
+Variante 1: tres renglones horizontales con un casillero marcado
+alineado en los tres.
+Variante 2: tres puntos alineados verticalmente sobre una grilla
+de puntos huecos.
+Variante 3: una columna sólida que atraviesa tres barras finas.
+Variante 4: tres cuadrados encastrados formando una sola pieza
+vertical.</code></pre>
+      </div>
+
+      <h3>Qué evitar, siempre</h3>
+      <ul>
+        <li><strong>Calendario, reloj, tilde, agenda abierta.</strong> Es lo primero que va a proponer cualquier modelo y es lo que ya tienen los ocho competidores.</li>
+        <li><strong>Degradados, 3D, sombras, brillos.</strong> El azul es plano.</li>
+        <li><strong>Personas, guardapolvos, cruces médicas, corazones.</strong> Turno Fijo no es una marca de salud, es una agenda.</li>
+        <li><strong>Círculos contenedores.</strong> Encierran la marca y matan los renglones.</li>
+        <li><strong>Casilleros desalineados.</strong> Si no están en columna perfecta, el logo dice otra cosa.</li>
+      </ul>
+
+      <h3>De la imagen al archivo final</h3>
+      <ul>
+        <li>Generá <strong>solo el isotipo</strong>, cuadrado, fondo plano.</li>
+        <li>Vectorizá: Recraft ya te da SVG; si no, <em>Imagen → Vectorizar mapa de bits</em> en Illustrator o la traza de Inkscape.</li>
+        <li><strong>Redibujalo encima.</strong> Tres rectángulos y tres líneas se hacen a mano en cinco minutos y quedan matemáticamente exactos. La IA sirve para explorar el concepto, no para entregar el archivo.</li>
+        <li>Componé la palabra en Archivo, ancho 120, peso 800, y convertila a curvas.</li>
+        <li>Exportá: SVG para web, PNG a 1024 px para WhatsApp, PDF vectorial para imprenta, y un ICO/PNG de 32 px que hayas mirado <em>al tamaño real</em> antes de darlo por bueno.</li>
+      </ul>
+
+      <p class="apunte">
+        El SVG que está en la sección 03 de este manual ya es el logo terminado: son tres
+        <code>&lt;rect&gt;</code> y tres <code>&lt;line&gt;</code>. Si el resultado de la IA no le
+        gana a eso, quedate con éste.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    Turno Fijo · Manual de marca v1 · 24 de agosto de 2026<br>
+    Cualquier pieza nueva se revisa contra tres cosas: los casilleros alineados, el azul plano
+    y el voseo. Si las tres están, es Turno Fijo.
+  </footer>
+
+</div>
