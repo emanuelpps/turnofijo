@@ -1,7 +1,10 @@
 import { crearClienteServidor } from '@/lib/supabase/servidor'
 import { FormularioHorarios } from '@/componentes/configuracion/formulario-horarios'
+import { FormularioPerfil } from '@/componentes/configuracion/formulario-perfil'
 import { PanelBloqueos } from '@/componentes/configuracion/panel-bloqueos'
 import type { Bloqueo, FranjaHorariaFila, Profesional } from '@/tipos/db'
+
+export const metadata = { title: 'Configuración' }
 
 export default async function ConfiguracionPage() {
   const supabase = await crearClienteServidor()
@@ -23,6 +26,10 @@ export default async function ConfiguracionPage() {
         </h1>
         <p className="mt-0.5 text-sm text-lapiz">Cuándo atendés y cuándo no.</p>
       </div>
+
+      <FormularioPerfil profesional={(profesional as Profesional | null) ?? null} />
+
+      <hr className="border-renglon" />
 
       <FormularioHorarios
         franjas={(franjas ?? []) as FranjaHorariaFila[]}

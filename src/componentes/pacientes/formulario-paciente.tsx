@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from 'react'
 import { guardarPaciente, type EstadoFormulario } from '@/acciones/pacientes'
+import { formatearTelefonoParaMostrar } from '@/lib/telefono'
 import { Boton } from '@/componentes/ui/boton'
 import { Campo } from '@/componentes/ui/campo'
 import type { Paciente } from '@/tipos/db'
@@ -30,7 +31,9 @@ export function FormularioPaciente({
         name="telefono"
         inputMode="tel"
         placeholder="2984 12-3456"
-        defaultValue={paciente?.telefono_e164 ?? ''}
+        // El E.164 crudo (+5492984556677) es incómodo de leer y de corregir.
+        // Se guarda normalizado igual: la normalización es idempotente.
+        defaultValue={paciente ? formatearTelefonoParaMostrar(paciente.telefono_e164) : ''}
         ayuda="Con código de área, sin el 0 ni el 15."
         required
       />

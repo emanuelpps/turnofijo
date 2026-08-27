@@ -19,7 +19,10 @@ const chivo = Chivo({
 })
 
 export const metadata: Metadata = {
-  title: 'Turno Fijo',
+  title: {
+    template: '%s · Turno Fijo',
+    default: 'Turno Fijo',
+  },
   description: 'Agenda de turnos para profesionales que trabajan con sesiones recurrentes',
 }
 

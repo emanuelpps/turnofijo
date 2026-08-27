@@ -8,11 +8,15 @@ import { normalizarTelefonoAR } from '@/lib/telefono'
 export type EstadoFormulario = { error?: string; ok?: boolean }
 
 const esquema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().uuid('No se pudo identificar el paciente. Recargá la página.').optional(),
   nombre: z.string().trim().min(2, 'Poné el nombre del paciente.'),
   telefono: z.string().trim().min(1, 'El teléfono es obligatorio: es por donde le vas a escribir.'),
   email: z.union([z.string().trim().email('Ese email no parece válido.'), z.literal('')]),
-  notas_administrativas: z.string().trim().max(500).optional(),
+  notas_administrativas: z
+    .string()
+    .trim()
+    .max(500, 'Las notas no pueden pasar de 500 caracteres.')
+    .optional(),
 })
 
 export async function guardarPaciente(

@@ -21,6 +21,10 @@ const TAMANOS: Record<Tamano, string> = {
 export function Boton({
   variante = 'primario',
   tamano = 'normal',
+  // Un <button> sin type es type="submit". Como varios botones de acción viven
+  // adentro de un <form> (el de archivar, el de cancelar), heredar submit hace
+  // que un botón que solo abre un diálogo mande el formulario de al lado.
+  type = 'button',
   className,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -29,6 +33,7 @@ export function Boton({
 }) {
   return (
     <button
+      type={type}
       {...props}
       className={clsx(
         'inline-flex items-center justify-center rounded-marca font-medium',

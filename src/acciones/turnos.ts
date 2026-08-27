@@ -13,11 +13,15 @@ import type { EstadoTurno } from '@/tipos/db'
 export type EstadoFormulario = { error?: string; ok?: boolean }
 
 const esquema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().uuid('No se pudo identificar el turno. Recargá la página.').optional(),
   patient_id: z.string().uuid('Elegí un paciente.'),
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Elegí una fecha.'),
   hora: z.string().regex(/^\d{2}:\d{2}$/, 'Elegí una hora.'),
-  duracion_min: z.coerce.number().int().min(5).max(480),
+  duracion_min: z.coerce
+    .number({ message: 'La duración tiene que ser un número de minutos.' })
+    .int('La duración tiene que ser un número entero de minutos.')
+    .min(5, 'El turno más corto es de 5 minutos.')
+    .max(480, 'El turno más largo es de 8 horas.'),
 })
 
 /** Turnos vigentes (no cancelados) que pisan el período, opcionalmente sin uno. */
@@ -95,6 +99,14 @@ export async function guardarTurno(
     turnosQueChocan(supabase, periodo, id),
   ])
 
+  // Sin horarios cargados TODO cae fuera de horario, y "está fuera de tus
+  // horarios de atención" deja al profesional nuevo sin saber qué hacer.
+  if (franjas.length === 0) {
+    return {
+      error: 'Todavía no cargaste tus horarios de atención. Andá a Configuración y cargalos.',
+    }
+  }
+
   const validacion = validarTurno({
     inicio,
     duracionMin: duracion_min,
@@ -152,15 +164,32 @@ export async function marcarAsistencia(datos: FormData) {
   revalidatePath('/agenda')
 }
 
-/** Devuelve un turno cancelado al estado programado, si el horario sigue libre. */
-export async function reactivarTurno(datos: FormData) {
+/**
+ * Devuelve un turno cancelado al estado programado.
+ *
+ * Puede fallar: mientras estuvo cancelado, ese horario pudo ocuparse con otro
+ * turno, y la restricción EXCLUDE rechaza el update. Antes esto se descartaba
+ * en silencio y el profesional apretaba el botón sin que pasara nada.
+ */
+export async function reactivarTurno(
+  _estado: EstadoFormulario,
+  datos: FormData,
+): Promise<EstadoFormulario> {
   const id = String(datos.get('id'))
   const supabase = await crearClienteServidor()
 
-  await supabase
+  const { error } = await supabase
     .from('appointments')
     .update({ estado: 'programado', cancelado_por: null })
     .eq('id', id)
 
+  if (error) {
+    if (error.code === '23P01') {
+      return { error: 'Ese horario ya se ocupó con otro turno. Movelo a otro horario.' }
+    }
+    return { error: 'No se pudo reactivar el turno.' }
+  }
+
   revalidatePath('/agenda')
+  return { ok: true }
 }

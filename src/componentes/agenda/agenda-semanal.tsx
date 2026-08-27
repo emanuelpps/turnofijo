@@ -1,8 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { cancelarTurno, marcarAsistencia, reactivarTurno } from '@/acciones/turnos'
+import {
+  cancelarTurno,
+  marcarAsistencia,
+  reactivarTurno,
+  type EstadoFormulario,
+} from '@/acciones/turnos'
 import { parsearTstzrange, utcALocal, sumarDias } from '@/lib/tiempo'
 import { diaCorto, diaYMes, fechaLarga } from '@/lib/formato'
 import { Boton } from '@/componentes/ui/boton'
@@ -10,13 +15,16 @@ import { Dialogo } from '@/componentes/ui/dialogo'
 import { FormularioTurno } from './formulario-turno'
 import type { EstadoTurno, Paciente, TurnoConPaciente } from '@/tipos/db'
 
+/** Lo que la agenda necesita saber de un día para no mandar al vacío. */
+export type EstadoDia = {
+  atiende: boolean
+  bloqueo: string | null
+}
+
 /**
  * Los estados llevan color Y palabra, siempre. El manual de marca (§04) lo pide
  * explícito: una parte de los usuarios no distingue verde de rojo, así que el
  * color nunca puede ser el único indicador.
- *
- * `programado` es el estado neutro y no tiene color propio: no necesita
- * etiqueta porque no hay color que desambiguar.
  */
 const ESTADOS: Record<EstadoTurno, { palabra: string; tarjeta: string; texto: string }> = {
   programado: {
@@ -72,18 +80,48 @@ function aVista(t: TurnoConPaciente): TurnoDeVista {
   }
 }
 
+/**
+ * Reactivar puede fallar si el horario se ocupó mientras el turno estaba
+ * cancelado, así que necesita estado propio para poder contarlo.
+ */
+function BotonReactivar({ id, onListo }: { id: string; onListo: () => void }) {
+  const [estado, accion, pendiente] = useActionState<EstadoFormulario, FormData>(reactivarTurno, {})
+
+  useEffect(() => {
+    if (estado.ok) onListo()
+  }, [estado.ok, onListo])
+
+  return (
+    <form action={accion} className="space-y-2">
+      <input type="hidden" name="id" value={id} />
+      {estado.error && (
+        <p role="alert" className="rounded-marca bg-falta-sup px-3 py-2 text-sm text-falta">
+          {estado.error}
+        </p>
+      )}
+      <Boton type="submit" tamano="grande" className="w-full" disabled={pendiente}>
+        {pendiente ? 'Reactivando…' : 'Reactivar turno'}
+      </Boton>
+    </form>
+  )
+}
+
 export function AgendaSemanal({
   lunes,
   hoy,
   turnos,
   pacientes,
   duracionDefault,
+  estadoPorDia,
+  tieneHorarios,
 }: {
   lunes: string
   hoy: string
   turnos: TurnoConPaciente[]
   pacientes: Paciente[]
   duracionDefault: number
+  estadoPorDia: Record<string, EstadoDia>
+  tieneHorarios: boolean
 }) {
   const [nuevoEn, setNuevoEn] = useState<string | null>(null)
   const [abierto, setAbierto] = useState<TurnoDeVista | null>(null)
@@ -133,12 +171,26 @@ export function AgendaSemanal({
         </nav>
       </div>
 
+      {!tieneHorarios && (
+        <div className="mb-4 rounded-marca border border-birome/40 bg-birome-sup px-4 py-3">
+          <p className="font-semibold text-tinta">Cargá tus horarios de atención.</p>
+          <p className="mt-0.5 text-sm text-tinta-sup">
+            Hasta que no los cargues no vas a poder agendar ningún turno.
+          </p>
+          <Link href="/configuracion" className="mt-3 inline-block">
+            <Boton>Ir a Configuración</Boton>
+          </Link>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
         {dias.map((fecha) => {
           const delDia = vista
             .filter((t) => t.fecha === fecha)
             .sort((a, b) => (a.hora < b.hora ? -1 : 1))
           const esHoy = fecha === hoy
+          const dia = estadoPorDia[fecha] ?? { atiende: true, bloqueo: null }
+          const sePuedeAgendar = dia.atiende && !dia.bloqueo
 
           return (
             <section
@@ -146,7 +198,8 @@ export function AgendaSemanal({
               aria-label={fechaLarga(fecha)}
               className={[
                 'rounded-marca border p-2',
-                esHoy ? 'border-birome bg-birome-sup/40' : 'border-renglon bg-papel',
+                esHoy ? 'border-birome bg-birome-sup/40' : 'border-renglon',
+                dia.bloqueo || !dia.atiende ? 'bg-papel-alt/60' : 'bg-papel',
               ].join(' ')}
             >
               <div className="mb-2 flex items-baseline gap-2 px-1">
@@ -161,6 +214,12 @@ export function AgendaSemanal({
                 <span className="tabular text-xs text-lapiz">{diaYMes(fecha)}</span>
                 {esHoy && <span className="etiqueta ml-auto text-birome">Hoy</span>}
               </div>
+
+              {dia.bloqueo && (
+                <p className="mb-2 truncate rounded bg-espera-sup px-1.5 py-1 text-xs font-semibold text-espera">
+                  {dia.bloqueo}
+                </p>
+              )}
 
               <ul className="space-y-1">
                 {delDia.map((t) => {
@@ -200,12 +259,18 @@ export function AgendaSemanal({
                 })}
               </ul>
 
-              <button
-                onClick={() => setNuevoEn(fecha)}
-                className="mt-2 min-h-11 w-full rounded-marca border border-dashed border-renglon text-sm font-medium text-lapiz hover:border-birome hover:text-birome"
-              >
-                + Turno
-              </button>
+              {sePuedeAgendar ? (
+                <button
+                  onClick={() => setNuevoEn(fecha)}
+                  className="mt-2 min-h-11 w-full rounded-marca border border-dashed border-renglon text-sm font-medium text-lapiz hover:border-birome hover:text-birome"
+                >
+                  + Turno
+                </button>
+              ) : (
+                <p className="mt-2 px-1 py-2 text-center text-xs text-lapiz">
+                  {dia.bloqueo ? 'Día bloqueado' : 'No atendés este día'}
+                </p>
+              )}
             </section>
           )
         })}
@@ -229,6 +294,7 @@ export function AgendaSemanal({
             turno={{
               id: moviendo.id,
               patient_id: moviendo.patient_id,
+              nombrePaciente: moviendo.nombrePaciente,
               fecha: moviendo.fecha,
               hora: moviendo.hora,
               duracion_min: moviendo.duracion_min,
@@ -260,12 +326,7 @@ export function AgendaSemanal({
             </div>
 
             {abierto.estado === 'cancelado' ? (
-              <form action={reactivarTurno} onSubmit={() => setAbierto(null)}>
-                <input type="hidden" name="id" value={abierto.id} />
-                <Boton type="submit" tamano="grande" className="w-full">
-                  Reactivar turno
-                </Boton>
-              </form>
+              <BotonReactivar id={abierto.id} onListo={() => setAbierto(null)} />
             ) : (
               <div className="space-y-2">
                 <div className="flex gap-2">

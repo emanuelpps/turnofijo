@@ -1,3 +1,6 @@
+'use client'
+
+import { useId } from 'react'
 import { clsx } from 'clsx'
 
 export function Campo({
@@ -13,10 +16,14 @@ export function Campo({
   error?: string
   ayuda?: string
 }) {
-  // Sin hooks: Campo tiene que poder usarse también desde un Server Component.
-  const idCampo = id ?? name
-  const idAyuda = ayuda && idCampo ? `${idCampo}-ayuda` : undefined
-  const idError = error && idCampo ? `${idCampo}-error` : undefined
+  // El id tiene que ser único por instancia, no derivado del name: la lista de
+  // pacientes deja montados a la vez el formulario de alta y el de edición, y
+  // dos inputs con el mismo id hacen que la etiqueta enfoque el campo del
+  // diálogo equivocado.
+  const idAutomatico = useId()
+  const idCampo = id ?? idAutomatico
+  const idAyuda = ayuda ? `${idCampo}-ayuda` : undefined
+  const idError = error ? `${idCampo}-error` : undefined
   const descrito = [idAyuda, idError].filter(Boolean).join(' ') || undefined
 
   return (

@@ -68,6 +68,41 @@ export async function guardarConfiguracion(
   return { ok: true }
 }
 
+/**
+ * El nombre se toma del registro y hasta acá no había forma de corregirlo:
+ * un error de tipeo al crear la cuenta quedaba para siempre en la pantalla.
+ */
+export async function guardarPerfil(
+  _estado: EstadoFormulario,
+  datos: FormData,
+): Promise<EstadoFormulario> {
+  const nombre = String(datos.get('nombre') ?? '').trim()
+  const especialidad = String(datos.get('especialidad') ?? '')
+
+  if (nombre.length < 2) {
+    return { error: 'Poné tu nombre.' }
+  }
+  if (!['psicologia', 'nutricion', 'otra'].includes(especialidad)) {
+    return { error: 'Elegí una especialidad.' }
+  }
+
+  const supabase = await crearClienteServidor()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'Se cerró tu sesión. Entrá de nuevo.' }
+
+  const { error } = await supabase
+    .from('professionals')
+    .update({ nombre, especialidad })
+    .eq('id', user.id)
+
+  if (error) return { error: 'No se pudieron guardar tus datos.' }
+
+  revalidatePath('/', 'layout')
+  return { ok: true }
+}
+
 export async function crearBloqueo(
   _estado: EstadoFormulario,
   datos: FormData,

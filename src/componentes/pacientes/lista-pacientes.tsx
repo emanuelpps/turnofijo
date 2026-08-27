@@ -8,7 +8,13 @@ import { Dialogo } from '@/componentes/ui/dialogo'
 import { FormularioPaciente } from './formulario-paciente'
 import type { Paciente } from '@/tipos/db'
 
-export function ListaPacientes({ pacientes }: { pacientes: Paciente[] }) {
+export function ListaPacientes({
+  pacientes,
+  turnosPorDelante,
+}: {
+  pacientes: Paciente[]
+  turnosPorDelante: Record<string, number>
+}) {
   const [enEdicion, setEnEdicion] = useState<Paciente | null>(null)
   const [creando, setCreando] = useState(false)
 
@@ -46,12 +52,19 @@ export function ListaPacientes({ pacientes }: { pacientes: Paciente[] }) {
         </div>
       ) : (
         <ul className="divide-y divide-renglon rounded-marca border border-renglon">
-          {activos.map((p) => (
+          {activos.map((p) => {
+            const porDelante = turnosPorDelante[p.id] ?? 0
+            return (
             <li key={p.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
               <div className="min-w-40 flex-1">
                 <p className="truncate font-semibold text-tinta">{p.nombre}</p>
                 <p className="tabular text-sm text-lapiz">
                   {formatearTelefonoParaMostrar(p.telefono_e164)}
+                  {porDelante > 0 && (
+                    <span className="ml-2 text-tinta-sup">
+                      · {porDelante} turno{porDelante === 1 ? '' : 's'} por delante
+                    </span>
+                  )}
                   {!p.contactable && (
                     <span className="etiqueta ml-2 rounded bg-espera-sup px-1.5 py-0.5 text-espera">
                       Revisar teléfono
@@ -71,7 +84,8 @@ export function ListaPacientes({ pacientes }: { pacientes: Paciente[] }) {
                 </form>
               </div>
             </li>
-          ))}
+            )
+          })}
         </ul>
       )}
 
