@@ -53,3 +53,22 @@ export type Profesional = {
   duracion_default_min: number
   timezone: string
 }
+
+export type SerieFrecuencia = 'semanal' | 'quincenal' | 'mensual'
+export type SerieEstado = 'activa' | 'finalizada' | 'cancelada'
+
+export type Serie = {
+  id: string
+  professional_id: string
+  patient_id: string
+  dia_semana: number
+  /** `HH:MM:SS` — Postgres devuelve `time` con segundos. */
+  hora_local: string
+  duracion_min: number
+  frecuencia: SerieFrecuencia
+  /** `null` = indefinida. */
+  sesiones_totales: number | null
+  desde: string
+  horizonte_hasta: string
+  estado: SerieEstado
+}
