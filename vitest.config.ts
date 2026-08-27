@@ -16,7 +16,7 @@ export default defineConfig({
           environment: 'node',
           include: ['tests/integration/**/*.test.ts'],
           setupFiles: ['tests/integration/setup.ts'],
-          fileParallelism: false,
+          poolOptions: { threads: { singleThread: true } },
           testTimeout: 30000,
           hookTimeout: 30000,
         },
