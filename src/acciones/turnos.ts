@@ -8,13 +8,13 @@ import { aTstzrange, localAUtc, sumarMinutos, parsearTstzrange } from '@/lib/tie
 import type { FranjaHoraria } from '@/lib/horarios'
 import type { Periodo } from '@/lib/solapamiento'
 import { validarTurno, MENSAJES_RECHAZO } from '@/lib/validar-turno'
+import { normalizarTelefonoAR } from '@/lib/telefono'
 import type { EstadoTurno } from '@/tipos/db'
 
 export type EstadoFormulario = { error?: string; ok?: boolean }
 
 const esquema = z.object({
   id: z.string().uuid('No se pudo identificar el turno. Recargá la página.').optional(),
-  patient_id: z.string().uuid('Elegí un paciente.'),
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Elegí una fecha.'),
   hora: z.string().regex(/^\d{2}:\d{2}$/, 'Elegí una hora.'),
   duracion_min: z.coerce
@@ -23,6 +23,58 @@ const esquema = z.object({
     .min(5, 'El turno más corto es de 5 minutos.')
     .max(480, 'El turno más largo es de 8 horas.'),
 })
+
+/**
+ * El paciente del turno: o uno ya cargado, o uno nuevo que se da de alta acá
+ * mismo. Que el paciente llame y haya que salir a otra pantalla para cargarlo
+ * antes de poder darle el turno es fricción pura.
+ *
+ * Si el teléfono ya está en la agenda se reusa esa ficha en vez de fallar por
+ * duplicado: si cargás el mismo número, es el mismo paciente. Eso además hace
+ * que reintentar después de un choque de horarios no rompa nada.
+ */
+async function resolverPaciente(
+  supabase: SupabaseClient,
+  professionalId: string,
+  datos: FormData,
+): Promise<{ patientId: string } | { error: string }> {
+  if (String(datos.get('paciente_nuevo') ?? '') !== '1') {
+    const id = String(datos.get('patient_id') ?? '')
+    if (!z.string().uuid().safeParse(id).success) return { error: 'Elegí un paciente.' }
+    return { patientId: id }
+  }
+
+  const nombre = String(datos.get('paciente_nombre') ?? '').trim()
+  if (nombre.length < 2) return { error: 'Poné el nombre del paciente.' }
+
+  const telefono = normalizarTelefonoAR(String(datos.get('paciente_telefono') ?? ''))
+  if (!telefono) {
+    return { error: 'Ese teléfono no se entiende. Ejemplo: 2984 12-3456 o +54 9 2984 123456.' }
+  }
+
+  const { data: existente } = await supabase
+    .from('patients')
+    .select('id, archivado_en')
+    .eq('telefono_e164', telefono)
+    .maybeSingle()
+
+  if (existente) {
+    // Le estás dando un turno: claramente vuelve a estar activo.
+    if (existente.archivado_en) {
+      await supabase.from('patients').update({ archivado_en: null }).eq('id', existente.id)
+    }
+    return { patientId: existente.id as string }
+  }
+
+  const { data: creado, error } = await supabase
+    .from('patients')
+    .insert({ professional_id: professionalId, nombre, telefono_e164: telefono })
+    .select('id')
+    .single()
+
+  if (error || !creado) return { error: 'No se pudo cargar el paciente.' }
+  return { patientId: creado.id as string }
+}
 
 /** Turnos vigentes (no cancelados) que pisan el período, opcionalmente sin uno. */
 async function turnosQueChocan(
@@ -68,7 +120,6 @@ export async function guardarTurno(
   const idCrudo = datos.get('id')
   const parseado = esquema.safeParse({
     id: idCrudo ? String(idCrudo) : undefined,
-    patient_id: datos.get('patient_id'),
     fecha: datos.get('fecha'),
     hora: datos.get('hora'),
     duracion_min: datos.get('duracion_min'),
@@ -77,7 +128,7 @@ export async function guardarTurno(
     return { error: parseado.error.issues[0].message }
   }
 
-  const { id, patient_id, fecha, hora, duracion_min } = parseado.data
+  const { id, fecha, hora, duracion_min } = parseado.data
 
   let inicio: Date
   try {
@@ -118,9 +169,14 @@ export async function guardarTurno(
     return { error: MENSAJES_RECHAZO[validacion.motivo] }
   }
 
+  // Recién acá, con el horario ya validado: si el paciente es nuevo y el turno
+  // no entraba, no queremos haberlo dado de alta para nada.
+  const paciente = await resolverPaciente(supabase, user.id, datos)
+  if ('error' in paciente) return { error: paciente.error }
+
   const fila = {
     professional_id: user.id,
-    patient_id,
+    patient_id: paciente.patientId,
     periodo: aTstzrange(periodo.inicio, periodo.fin),
   }
 
@@ -137,6 +193,7 @@ export async function guardarTurno(
   }
 
   revalidatePath('/agenda')
+  revalidatePath('/pacientes')
   return { ok: true }
 }
 
