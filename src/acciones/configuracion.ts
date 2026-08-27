@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
-import { aTstzrange, localAUtc } from '@/lib/tiempo'
+import { aTstzrange, localAUtc, parsearTstzrange } from '@/lib/tiempo'
+import { dentroDeHorarioDeAtencion } from '@/lib/horarios'
 
 export type EstadoFormulario = { error?: string; ok?: boolean; aviso?: string }
 
@@ -65,6 +66,32 @@ export async function guardarConfiguracion(
 
   revalidatePath('/configuracion')
   revalidatePath('/agenda')
+
+  // Achicar un horario no cancela los turnos que ya estaban adentro. Igual que
+  // con los bloqueos, el profesional tiene que enterarse acá y no por un turno
+  // que aparece a una hora que ya no atiende.
+  const { data: futuros } = await supabase
+    .from('appointments')
+    .select('periodo')
+    .neq('estado', 'cancelado')
+    .filter('periodo', 'ov', `[${new Date().toISOString()},)`)
+
+  const afuera = (futuros ?? []).filter((t) => {
+    const { inicio, fin } = parsearTstzrange(t.periodo as string)
+    const duracionMin = Math.round((fin.getTime() - inicio.getTime()) / 60_000)
+    return !dentroDeHorarioDeAtencion(inicio, duracionMin, franjas)
+  }).length
+
+  if (afuera > 0) {
+    return {
+      ok: true,
+      aviso:
+        afuera === 1
+          ? 'Ojo: 1 turno que ya tenías agendado queda fuera de estos horarios. No se canceló.'
+          : `Ojo: ${afuera} turnos que ya tenías agendados quedan fuera de estos horarios. No se cancelaron.`,
+    }
+  }
+
   return { ok: true }
 }
 
@@ -150,7 +177,10 @@ export async function crearBloqueo(
   if (count && count > 0) {
     return {
       ok: true,
-      aviso: `Ojo: quedaron ${count} turno${count === 1 ? '' : 's'} agendado${count === 1 ? '' : 's'} adentro de ese bloqueo. No se cancelaron solos.`,
+      aviso:
+        count === 1
+          ? 'Ojo: quedó 1 turno agendado adentro de ese bloqueo. No se canceló solo.'
+          : `Ojo: quedaron ${count} turnos agendados adentro de ese bloqueo. No se cancelaron solos.`,
     }
   }
 

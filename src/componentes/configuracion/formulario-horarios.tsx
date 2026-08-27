@@ -141,9 +141,14 @@ export function FormularioHorarios({
           {estado.error}
         </p>
       )}
-      {estado.ok && (
+      {estado.ok && !estado.aviso && (
         <p role="status" className="rounded-marca bg-vino-sup px-3 py-2 text-sm text-vino">
           Guardado.
+        </p>
+      )}
+      {estado.aviso && (
+        <p role="status" className="rounded-marca bg-espera-sup px-3 py-2 text-sm text-espera">
+          {estado.aviso}
         </p>
       )}
 
