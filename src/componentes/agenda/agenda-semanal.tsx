@@ -13,6 +13,7 @@ import { diaCorto, diaYMes, fechaLarga } from '@/lib/formato'
 import { Boton } from '@/componentes/ui/boton'
 import { Dialogo } from '@/componentes/ui/dialogo'
 import { FormularioTurno } from './formulario-turno'
+import { FormularioSerie } from '@/componentes/series/formulario-serie'
 import type { EstadoTurno, Paciente, TurnoConPaciente } from '@/tipos/db'
 
 /** Lo que la agenda necesita saber de un día para no mandar al vacío. */
@@ -53,6 +54,10 @@ const ESTADOS: Record<EstadoTurno, { palabra: string; tarjeta: string; texto: st
     texto: 'text-lapiz',
   },
 }
+
+/** Los dos botones de alta comparten estilo: son la misma acción en dos formas. */
+const BOTON_AGREGAR =
+  'min-h-11 flex-1 rounded-marca border border-dashed border-renglon px-1 text-sm font-medium text-lapiz hover:border-birome hover:text-birome'
 
 type TurnoDeVista = {
   id: string
@@ -126,6 +131,7 @@ export function AgendaSemanal({
   const [nuevoEn, setNuevoEn] = useState<string | null>(null)
   const [abierto, setAbierto] = useState<TurnoDeVista | null>(null)
   const [moviendo, setMoviendo] = useState<TurnoDeVista | null>(null)
+  const [serieEn, setSerieEn] = useState<string | null>(null)
 
   const dias = Array.from({ length: 7 }, (_, i) => sumarDias(lunes, i))
   const vista = turnos.map(aVista)
@@ -260,12 +266,14 @@ export function AgendaSemanal({
               </ul>
 
               {sePuedeAgendar ? (
-                <button
-                  onClick={() => setNuevoEn(fecha)}
-                  className="mt-2 min-h-11 w-full rounded-marca border border-dashed border-renglon text-sm font-medium text-lapiz hover:border-birome hover:text-birome"
-                >
-                  + Turno
-                </button>
+                <div className="mt-2 flex gap-1">
+                  <button onClick={() => setNuevoEn(fecha)} className={BOTON_AGREGAR}>
+                    + Turno
+                  </button>
+                  <button onClick={() => setSerieEn(fecha)} className={BOTON_AGREGAR}>
+                    + Serie
+                  </button>
+                </div>
               ) : (
                 <p className="mt-2 px-1 py-2 text-center text-xs text-lapiz">
                   {dia.bloqueo ? 'Día bloqueado' : 'No atendés este día'}
@@ -283,6 +291,19 @@ export function AgendaSemanal({
             turno={{ fecha: nuevoEn, hora: '', duracion_min: duracionDefault }}
             pacientes={pacientes}
             onGuardado={() => setNuevoEn(null)}
+          />
+        )}
+      </Dialogo>
+
+      <Dialogo abierto={serieEn !== null} onCerrar={() => setSerieEn(null)} titulo="Nueva serie">
+        {serieEn && (
+          <FormularioSerie
+            key={serieEn}
+            pacientes={pacientes}
+            fechaInicial={serieEn}
+            diaInicial={new Date(`${serieEn}T00:00:00Z`).getUTCDay()}
+            duracionDefault={duracionDefault}
+            onCreada={() => setSerieEn(null)}
           />
         )}
       </Dialogo>
