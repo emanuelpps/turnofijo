@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { crearClienteServidor } from '@/lib/supabase/servidor'
 import { aTstzrange, localAUtc } from '@/lib/tiempo'
 
-export type EstadoFormulario = { error?: string; ok?: boolean }
+export type EstadoFormulario = { error?: string; ok?: boolean; aviso?: string }
 
 const DIAS = [0, 1, 2, 3, 4, 5, 6] as const
 const BLOQUES = ['manana', 'tarde'] as const
@@ -101,8 +101,24 @@ export async function crearBloqueo(
   })
   if (error) return { error: 'No se pudo guardar el bloqueo.' }
 
+  // El bloqueo no cancela turnos ya agendados, pero el profesional tiene que
+  // enterarse de que quedaron adentro.
+  const { count } = await supabase
+    .from('appointments')
+    .select('id', { count: 'exact', head: true })
+    .neq('estado', 'cancelado')
+    .filter('periodo', 'ov', aTstzrange(inicio, finExclusivo))
+
   revalidatePath('/configuracion')
   revalidatePath('/agenda')
+
+  if (count && count > 0) {
+    return {
+      ok: true,
+      aviso: `Ojo: quedaron ${count} turno${count === 1 ? '' : 's'} agendado${count === 1 ? '' : 's'} adentro de ese bloqueo. No se cancelaron solos.`,
+    }
+  }
+
   return { ok: true }
 }
 

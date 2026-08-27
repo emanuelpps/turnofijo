@@ -45,6 +45,9 @@ export function PanelBloqueos({ bloqueos }: { bloqueos: Bloqueo[] }) {
       </form>
 
       {estado.error && <p className="mb-3 text-sm text-red-600">{estado.error}</p>}
+      {estado.aviso && (
+        <p className="mb-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{estado.aviso}</p>
+      )}
 
       {bloqueos.length === 0 ? (
         <p className="text-sm text-zinc-500">No tenés días bloqueados.</p>
